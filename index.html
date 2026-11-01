@@ -1,0 +1,1224 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sprawdzian: Dodawanie i odejmowanie</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22 font-size=%2280%22><text y=%2280%22>%E2%9E%95</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Układ: jedna karta na środku (jak w pozostałych sprawdzianach); zielony jak w podręczniku */
+  :root{
+    --bg1:#e8f5ec; --bg2:#eaf0fb; --card:#ffffff; --ink:#1c2a24; --muted:#56665e; --line:#d3e0d8; --soft:#f4f8f5;
+    --primary:#16794a; --primary-dark:#0f5e39; --primary-soft:#dcf2e5; --on-primary:#ffffff;
+    --blue:#1d4ed8; --blue-soft:#e0e9fd;
+    --good:#15803d; --good-soft:#dcfce7; --bad:#dc2626; --bad-soft:#fee2e2;
+    --half:#b45309; --half-soft:#fef3c7;
+    --warn-soft:#fef6d8; --warn-line:#f3dd8c; --warn-ink:#6b4a0c;
+    --e1:#e08a2c;
+    --shadow:0 10px 30px rgba(15,94,57,.12);
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --bg1:#0f1a15; --bg2:#121a2a; --card:#1a2622; --ink:#e3efe8; --muted:#a2b5aa; --line:#33483e; --soft:#21302a;
+    --primary:#5fd39a; --primary-dark:#8ee3b8; --primary-soft:#173a2a; --on-primary:#0b1a12;
+    --blue:#8fb0ff; --blue-soft:#1e2c5a;
+    --good:#4ade80; --good-soft:#153823; --bad:#f87171; --bad-soft:#3f1d1d;
+    --half:#fbbf24; --half-soft:#3a2c0c;
+    --warn-soft:#352b10; --warn-line:#5e4a17; --warn-ink:#fcd88a;
+    --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --bg1:#0f1a15; --bg2:#121a2a; --card:#1a2622; --ink:#e3efe8; --muted:#a2b5aa; --line:#33483e; --soft:#21302a;
+    --primary:#5fd39a; --primary-dark:#8ee3b8; --primary-soft:#173a2a; --on-primary:#0b1a12;
+    --blue:#8fb0ff; --blue-soft:#1e2c5a;
+    --good:#4ade80; --good-soft:#153823; --bad:#f87171; --bad-soft:#3f1d1d;
+    --half:#fbbf24; --half-soft:#3a2c0c;
+    --warn-soft:#352b10; --warn-line:#5e4a17; --warn-ink:#fcd88a;
+    --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;min-height:100vh;
+    font-family:'Quicksand','Trebuchet MS',-apple-system,sans-serif;
+    background:var(--bg1);
+    background-image:linear-gradient(160deg,var(--bg1),var(--bg2));
+    color:var(--ink);padding:16px;
+  }
+  .wrap{max-width:660px;margin:0 auto;}
+  header{text-align:center;margin-bottom:18px;}
+  h1{font-size:1.7rem;margin:0 0 4px;text-wrap:balance;}
+  .subtitle{margin:0;color:var(--muted);}
+  .card{background:var(--card);border-radius:24px;padding:24px;box-shadow:var(--shadow);text-align:center;}
+  @media (max-width:420px){ .card{padding:18px 14px;} }
+  .primary-btn{background:var(--primary);color:var(--on-primary);border:none;border-radius:14px;padding:14px 28px;font-size:1.1rem;font-weight:700;cursor:pointer;margin-top:16px;font-family:inherit;transition:transform .15s, background .15s;}
+  .primary-btn:hover{background:var(--primary-dark);transform:translateY(-2px);}
+  .primary-btn:disabled{opacity:.5;cursor:default;transform:none;}
+  .gold-btn{background:var(--e1);color:#1f1400;}
+  .gold-btn:hover{background:var(--e1);filter:brightness(1.08);}
+  .start-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .full-box{background:var(--primary-soft);border:2px solid var(--primary);border-radius:16px;padding:16px;margin-bottom:18px;text-align:center;}
+  .full-box .primary-btn{margin-top:0;font-size:1.2rem;}
+  .full-box p{margin:10px 0 0;font-size:.9rem;color:var(--muted);line-height:1.45;}
+  .rules{text-align:left;background:var(--warn-soft);border:1px solid var(--warn-line);color:var(--warn-ink);border-radius:14px;padding:12px 14px;margin:14px 0 18px;font-size:.92rem;line-height:1.5;}
+  .rules ul{margin:6px 0 0;padding-left:20px;}
+  .or-line{text-align:left;font-weight:700;margin:0 0 8px;}
+  #timer{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;padding:2px 10px;border-radius:999px;background:var(--soft);border:2px solid var(--line);}
+  #timer.low{border-color:var(--e1);color:var(--e1);}
+  #timer.out{border-color:var(--bad);color:var(--bad);}
+  .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .progress-bar{flex:1;height:10px;background:var(--line);border-radius:6px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--primary);transition:width .3s;width:0;}
+  #progress-text{font-size:.85rem;color:var(--muted);white-space:nowrap;}
+  .score-row{text-align:right;font-weight:700;color:var(--primary);margin-bottom:4px;font-variant-numeric:tabular-nums;}
+  .q-number{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--primary-dark);background:var(--primary-soft);border-radius:8px;padding:3px 12px;margin-bottom:10px;}
+  .q-pts{display:inline-block;font-size:.72rem;font-weight:800;color:var(--blue);background:var(--blue-soft);border-radius:8px;padding:3px 10px;margin-left:6px;}
+  .q-instruction{font-size:1.08rem;font-weight:700;margin:8px 0;text-align:left;text-wrap:pretty;line-height:1.45;}
+  .q-sub{font-size:.92rem;color:var(--muted);margin:0 0 6px;text-align:left;}
+  .model{display:inline-block;font-weight:700;background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:6px 12px;margin:4px 0 6px;font-variant-numeric:tabular-nums;}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .options{display:grid;gap:10px;margin-top:16px;grid-template-columns:repeat(2,1fr);}
+  .options.one-col{grid-template-columns:1fr;}
+  @media (max-width:420px){ .options{grid-template-columns:1fr;} }
+  .opt-btn{border:2px solid var(--line);background:var(--soft);border-radius:14px;padding:12px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);transition:all .15s;font-variant-numeric:tabular-nums;}
+  .opt-btn:hover:not(:disabled){border-color:var(--primary);}
+  .opt-btn:disabled{cursor:default;}
+  .opt-btn.selected{border-color:var(--primary);background:var(--primary-soft);}
+  .opt-btn.correct{border-color:var(--good);background:var(--good-soft);color:var(--good);}
+  .opt-btn.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .check-btn{background:var(--primary);color:var(--on-primary);border:none;border-radius:12px;padding:10px 20px;font-weight:700;cursor:pointer;font-family:inherit;font-size:1rem;}
+  .check-btn:disabled{opacity:.6;cursor:default;}
+  .ghost-btn{background:none;border:2px solid var(--line);color:var(--muted);border-radius:12px;padding:8px 16px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.95rem;}
+  .ghost-btn:disabled{opacity:.5;cursor:default;}
+  .center-row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--primary);outline-offset:2px;}
+  /* pola do wpisywania */
+  .fields{display:grid;gap:10px;margin-top:12px;text-align:left;}
+  .field{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;}
+  .field.block{display:grid;gap:4px;}
+  .field-label{font-weight:700;min-width:150px;}
+  .field-label .arrow{color:var(--muted);margin-left:4px;}
+  .field-label.num{min-width:48px;text-align:right;color:var(--primary-dark);}
+  .field.block .field-label,.field-label.inline{min-width:0;}
+  .field-text{font-weight:700;font-variant-numeric:tabular-nums;}
+  .field-tip{font-size:.85rem;color:var(--muted);font-weight:700;}
+  .answer-input{width:190px;max-width:100%;padding:8px 10px;font-size:1.06rem;border:2px solid var(--line);border-radius:12px;font-family:inherit;font-weight:700;background:var(--card);color:var(--ink);font-variant-numeric:tabular-nums;}
+  .answer-input.short{width:120px;}
+  .answer-input.tiny{width:64px;text-align:center;}
+  .answer-input.wide{width:100%;}
+  .answer-input.correct{border-color:var(--good);background:var(--good-soft);}
+  .answer-input.half{border-color:var(--half);background:var(--half-soft);}
+  .answer-input.wrong{border-color:var(--bad);background:var(--bad-soft);}
+  .fix{font-size:.88rem;font-weight:800;color:var(--good);}
+  .fix.half-fix{color:var(--half);}
+  /* przyporządkowanie */
+  .sort-list{display:grid;gap:8px;margin-top:14px;text-align:left;}
+  .sort-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:2px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--soft);}
+  .sort-row.correct{border-color:var(--good);background:var(--good-soft);}
+  .sort-row.wrong{border-color:var(--bad);background:var(--bad-soft);}
+  .sort-item{flex:1 1 200px;font-weight:700;min-width:0;font-variant-numeric:tabular-nums;}
+  .sort-cats{display:flex;gap:6px;flex-wrap:wrap;}
+  .cat-btn{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:6px 14px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;color:var(--ink);}
+  .cat-btn.selected{border-color:var(--primary);background:var(--primary-soft);}
+  .cat-btn.should{border-color:var(--good);border-style:dashed;background:var(--good-soft);}
+  .sort-row.wrong .cat-btn.selected{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .cat-btn:disabled{cursor:default;}
+  .match-select{font-family:inherit;font-size:.98rem;font-weight:700;padding:7px 8px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);max-width:100%;}
+  .match-fix{font-size:.85rem;font-weight:800;color:var(--good);width:100%;}
+  /* kolejność */
+  .order-btn{position:relative;text-align:left;padding-left:44px;}
+  .order-btn .badge{position:absolute;left:10px;top:50%;transform:translateY(-50%);min-width:26px;height:26px;border-radius:13px;background:var(--line);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:.9rem;padding:0 6px;}
+  .order-btn.selected .badge{background:var(--primary);color:var(--on-primary);}
+  /* chmurka z liczbami */
+  .word-pick{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:center;padding:14px;border-radius:40px;background:var(--blue-soft);}
+  .word-btn{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:6px 12px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .word-btn.selected{border-color:var(--primary);background:var(--primary-soft);}
+  .word-btn.correct{border-color:var(--good);background:var(--good-soft);color:var(--good);}
+  .word-btn.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .word-btn.missed{border-style:dashed;}
+  .word-btn:disabled{cursor:default;}
+  /* oś liczbowa */
+  .axis{display:block;width:100%;max-width:460px;margin:12px auto 4px;color:var(--ink);}
+  .axis-dot,.axis-letter{fill:var(--blue);}
+  .feedback{min-height:28px;margin-top:14px;font-weight:700;font-size:1.02rem;}
+  .feedback-good{color:var(--good);}
+  .feedback-half{color:var(--warn-ink);}
+  .feedback-bad{color:var(--bad);}
+  .hint-box{margin-top:10px;padding:10px 14px;background:var(--warn-soft);border:1px solid var(--warn-line);border-radius:12px;font-size:.92rem;font-weight:500;color:var(--warn-ink);text-align:left;line-height:1.5;}
+  .hint-box strong,.hint-box b{color:var(--warn-ink);}
+  footer{text-align:center;margin-top:20px;color:var(--muted);font-size:.85rem;}
+  h2{margin-top:0;color:var(--primary);}
+  /* wybór lekcji + wyniki */
+  .lesson-pick{display:grid;gap:6px;text-align:left;margin:10px 0 4px;}
+  .lesson-pick label{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;background:var(--soft);border:2px solid var(--line);cursor:pointer;font-weight:700;}
+  .lesson-pick input{width:18px;height:18px;accent-color:var(--primary);flex:none;}
+  .lesson-pick .code{color:var(--primary-dark);font-variant-numeric:tabular-nums;}
+  .lesson-pick .cnt{margin-left:auto;font-size:.8rem;color:var(--muted);font-weight:500;white-space:nowrap;}
+  .pick-tools{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--muted);flex-wrap:wrap;gap:8px;}
+  .link-btn{background:none;border:none;color:var(--primary);font-weight:700;cursor:pointer;font-family:inherit;padding:0;}
+  .intro{text-align:left;line-height:1.5;margin:0;}
+  .breakdown{text-align:left;display:grid;gap:8px;margin:16px 0;}
+  .bd-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:.92rem;}
+  .bd-bar{grid-column:1 / -1;height:8px;background:var(--line);border-radius:6px;overflow:hidden;}
+  .bd-fill{height:100%;border-radius:6px;}
+  .bd-score{font-weight:700;font-variant-numeric:tabular-nums;}
+  .review{text-align:left;margin-top:8px;}
+  .review h3{font-size:1rem;margin:0 0 6px;}
+  .review ul{margin:0;padding-left:20px;line-height:1.5;font-size:.92rem;}
+  .result-grade{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0 6px;}
+  .grade-num{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:800;color:var(--card);font-variant-numeric:tabular-nums;}
+  .grade-txt{display:grid;text-align:left;line-height:1.3;}
+  .grade-txt b{font-size:1.15rem;}
+  .grade-txt span{font-size:.85rem;color:var(--muted);}
+  @media (prefers-reduced-motion:reduce){ .primary-btn,.progress-fill{transition:none} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>➕ Sprawdzian z matematyki</h1>
+    <p class="subtitle">Dział II — Dodawanie i odejmowanie</p>
+  </header>
+
+  <section id="start-screen" class="card">
+    <p class="intro">Sprawdzian powstał na podstawie podręcznika (s. 48–90): zapisywanie i porównywanie liczb, oś liczbowa, dodawanie i odejmowanie w pamięci, szacowanie, sprytne dodawanie i sprytne odejmowanie. Najwięcej zadań jest wzorowanych na <b>Zadaniach powtórzeniowych</b> ze s. 88–90. <b>Liczby losują się za każdym razem.</b></p>
+    <div class="rules">
+      <b>✍️ Jak wpisywać odpowiedzi</b>
+      <ul>
+        <li>Wyniki wpisuj <b>cyframi</b>. W dużych liczbach możesz zostawić odstępy albo nie: <b>9 070 500</b> i <b>9070500</b> liczą się tak samo.</li>
+        <li>Nie musisz dopisywać jednostek (zł, cm, lat).</li>
+        <li>Gdy zapisujesz liczbę <b>słownie</b>, pamiętaj o polskich znakach — ich brak to pół punktu.</li>
+      </ul>
+    </div>
+    <div class="full-box">
+      <button id="full-btn" class="primary-btn">📝 Sprawdzian – 45 minut</button>
+      <p id="full-info"></p>
+    </div>
+    <p class="or-line">Albo poćwicz wybrane lekcje (bez limitu czasu):</p>
+    <div class="pick-tools">
+      <span>Które lekcje ćwiczymy?</span>
+      <span><button class="link-btn" id="pick-all">zaznacz wszystkie</button> · <button class="link-btn" id="pick-none">odznacz</button></span>
+    </div>
+    <div class="lesson-pick" id="lesson-pick"></div>
+    <div class="start-btns">
+      <button id="start-btn" class="primary-btn gold-btn">Ćwicz wybrane lekcje</button>
+    </div>
+  </section>
+
+  <section id="quiz-screen" class="card" hidden>
+    <div class="progress-row">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <span id="progress-text"></span>
+      <span id="timer" hidden></span>
+    </div>
+    <div class="score-row">Wynik: <span id="score-text">0</span>/<span id="score-total">0</span> pkt</div>
+    <div><span class="q-number" id="q-number"></span><span class="q-pts" id="q-pts"></span></div>
+    <div id="question-area"></div>
+    <div class="feedback" id="feedback"></div>
+    <button id="next-btn" class="primary-btn" hidden>Dalej ▶</button>
+  </section>
+
+  <section id="result-screen" class="card" hidden>
+    <h2 id="result-title"></h2>
+    <div class="result-grade" id="result-grade"></div>
+    <p id="result-desc"></p>
+    <div class="breakdown" id="breakdown"></div>
+    <div class="review" id="review"></div>
+    <button id="restart-btn" class="primary-btn">Wróć na start</button>
+  </section>
+
+  <footer>
+    <p>Na podstawie podręcznika do matematyki dla klasy 4 — dział II „Dodawanie i odejmowanie” (lekcje 1–6, Podsumowanie, Zadania powtórzeniowe). Zadania generowane losowo.</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+const pick = (arr,n) => shuffle(arr).slice(0,n);
+const one = arr => arr[Math.floor(Math.random()*arr.length)];
+const rnd = (a,b) => a+Math.floor(Math.random()*(b-a+1));
+const esc = s => String(s).replace(/[&<>"]/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+const fmtPts = n => Number.isInteger(n) ? String(n) : n.toFixed(1).replace('.',',');
+const ptsWord = n => n===1 ? 'punkt' : (n>=2&&n<=4 ? 'punkty' : 'punktów');
+
+/* =========================================================
+   LICZBY: zapis z odstępami, odmiana, zapis słowny
+   ========================================================= */
+// Jak w podręczniku: liczby czterocyfrowe bez odstępu (7309), od pięciu cyfr grupy po trzy (12 845)
+const fmtN = n => { const s=String(n); return s.length<5 ? s : s.replace(/\B(?=(\d{3})+(?!\d))/g,' '); };
+// odmiana po liczebniku: 1 tysiąc, 2–4 tysiące (ale 12–14 tysięcy), 5+ tysięcy
+function form(n, one, few, many){
+  if(n===1) return one;
+  const d=n%10, t=n%100;
+  return d>=2 && d<=4 && !(t>=12 && t<=14) ? few : many;
+}
+const lat = n => form(n,'rok','lata','lat');
+// liczba, po której rzeczownik ma formę „wielu” (5 grzybów, 37 kaczek), żeby nie pisać „32 grzybów”
+function rndMany(lo,hi){ let n; do n=rnd(lo,hi); while(form(n,1,2,3)!==3); return n; }
+
+const ONES=['','jeden','dwa','trzy','cztery','pięć','sześć','siedem','osiem','dziewięć','dziesięć','jedenaście','dwanaście','trzynaście','czternaście','piętnaście','szesnaście','siedemnaście','osiemnaście','dziewiętnaście'];
+const TENS=['','','dwadzieścia','trzydzieści','czterdzieści','pięćdziesiąt','sześćdziesiąt','siedemdziesiąt','osiemdziesiąt','dziewięćdziesiąt'];
+const HUNDS=['','sto','dwieście','trzysta','czterysta','pięćset','sześćset','siedemset','osiemset','dziewięćset'];
+function words3(n){
+  const h=Math.floor(n/100), r=n%100, p=[];
+  if(h) p.push(HUNDS[h]);
+  if(r<20){ if(r) p.push(ONES[r]); }
+  else { p.push(TENS[Math.floor(r/10)]); if(r%10) p.push(ONES[r%10]); }
+  return p.join(' ');
+}
+function plWords(n){
+  if(n===0) return 'zero';
+  const m=Math.floor(n/1e6), t=Math.floor(n/1000)%1000, r=n%1000, p=[];
+  if(m) p.push(m===1 ? 'milion' : words3(m)+' '+form(m,'milion','miliony','milionów'));
+  if(t) p.push(t===1 ? 'tysiąc' : words3(t)+' '+form(t,'tysiąc','tysiące','tysięcy'));
+  if(r) p.push(words3(r));
+  return p.join(' ');
+}
+
+/* =========================================================
+   SPRAWDZANIE ODPOWIEDZI
+   Liczby: porównujemy same cyfry (odstępy i jednostki nie mają znaczenia).
+   Słowa: ok – bez błędu; caps / diac – drobny błąd (½ pkt); bad – inne słowo albo literówka (0 pkt)
+   ========================================================= */
+const norm = s => String(s).normalize('NFC').replace(/[.!?,;:]+/g,' ').replace(/\s+/g,' ').trim();
+const stripPl = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ł/g,'l').replace(/Ł/g,'L');
+function compare(v, A){
+  if(v===A) return 'ok';
+  if(v.toLowerCase()===A.toLowerCase()) return 'ok';
+  if(stripPl(v.toLowerCase())===stripPl(A.toLowerCase())) return 'diac';
+  return 'bad';
+}
+const RANK = {ok:3, diac:2, bad:0};
+function checkField(f, raw){
+  if(f.number){
+    const v=String(raw).replace(/[^\d]/g,'');
+    return {res: v!=='' && v===f.accepted[0] ? 'ok' : 'bad', ans:fmtN(f.accepted[0])};
+  }
+  const v=norm(raw);
+  if(!v) return {res:'bad', ans:f.accepted[0]};
+  let best={res:'bad', ans:f.accepted[0]};
+  for(const a of f.accepted){
+    const r=compare(v, norm(a));
+    if(RANK[r]>RANK[best.res]) best={res:r, ans:a};
+    if(r==='ok') break;
+  }
+  return best;
+}
+const NOTES = {
+  diac:'<b>Polskie znaki:</b> pamiętaj o ą, ć, ę, ł, ń, ó, ś, ź, ż (np. <i>pięćdziesiąt, tysięcy, dwieście</i>)!'
+};
+
+// Pola do wpisania. field: {label, pre, post, accepted:[...], number, lang, size:'short'|'tiny'|'wide', block, num}
+function renderFields(container, fields, onAnswer){
+  const wrap=document.createElement('div'); wrap.className='fields';
+  fields.forEach((f,i)=>{
+    const row=document.createElement('div'); row.className='field'+(f.block?' block':'');
+    const ph = f.placeholder ?? '';
+    row.innerHTML=
+      (f.label!=null?`<label class="field-label${f.num?' num':''}${(f.pre||f.post)&&!f.block?' inline':''}" for="f${i}">${f.label}${f.block||f.num||f.pre||f.post?'':'<span class="arrow">→</span>'}</label>`:'')+
+      (f.block?'<div class="field">':'')+
+      (f.pre?`<span class="field-text">${f.pre}</span>`:'')+
+      `<input type="text" id="f${i}" class="answer-input ${f.size||''}"${f.number?' inputmode="numeric"':''} lang="pl" placeholder="${ph}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">`+
+      (f.post?`<span class="field-text">${f.post}</span>`:'')+
+      `<span class="fix"></span>`+
+      (f.block?'</div>':'');
+    wrap.appendChild(row);
+  });
+  container.appendChild(wrap);
+  const r=document.createElement('div'); r.className='center-row';
+  const check=document.createElement('button'); check.className='check-btn'; check.textContent='Sprawdź';
+  r.appendChild(check); container.appendChild(r);
+  const inputs=[...wrap.querySelectorAll('input')];
+  inputs.forEach((inp,i)=>inp.addEventListener('keydown',e=>{
+    if(e.key!=='Enter') return;
+    e.preventDefault();
+    if(i<inputs.length-1) inputs[i+1].focus(); else check.click();
+  }));
+  check.onclick=()=>{
+    if(inputs.every(x=>!x.value.trim())){ inputs[0].focus(); return; }
+    lockAll(wrap); check.disabled=true;
+    let score=0; const notes=new Set();
+    fields.forEach((f,i)=>{
+      const {res,ans}=checkField(f, inputs[i].value);
+      const fix=inputs[i].parentElement.querySelector('.fix');
+      if(res==='ok'){ score+=1; inputs[i].classList.add('correct'); return; }
+      if(res==='bad'){ inputs[i].classList.add('wrong'); fix.textContent='➜ '+ans; return; }
+      score+=0.5; inputs[i].classList.add('half'); fix.classList.add('half-fix'); fix.textContent='½ ➜ '+ans;
+      notes.add(NOTES[res]);
+    });
+    onAnswer(score/fields.length, false, [...notes].join('<br>'));
+  };
+  setTimeout(()=>inputs[0].focus({preventScroll:true}),50);
+}
+
+/* =========================================================
+   TYPY PYTAŃ (każdy zwraca ułamek 0–1, a punkty liczy handleAnswer)
+   ========================================================= */
+function lockAll(wrap){ wrap.querySelectorAll('button,input,select').forEach(b=>b.disabled=true); }
+
+// Jedna poprawna odpowiedź. opt: {text|html, correct}
+function renderOptions(container, options, onAnswer, oneCol){
+  const wrap=document.createElement('div');
+  wrap.className='options'+(oneCol?' one-col':'');
+  options.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    if(opt.html) btn.innerHTML=opt.html; else btn.textContent=opt.text;
+    btn.onclick=()=>{
+      lockAll(wrap);
+      btn.classList.add(opt.correct?'correct':'wrong');
+      if(!opt.correct) wrap.children[options.findIndex(o=>o.correct)].classList.add('correct');
+      onAnswer(opt.correct?1:0);
+    };
+    wrap.appendChild(btn);
+  });
+  container.appendChild(wrap);
+}
+const opts = (correct, ...wrong) => shuffle([{text:correct,correct:true}, ...wrong.map(t=>({text:t,correct:false}))]);
+// Odpowiedzi liczbowe A–D: poprawna + trzy pierwsze różne błędne z listy kandydatów
+function numOpts(correct, cands, fmt=fmtN){
+  const seen=new Set([correct]), wrong=[];
+  for(const c of cands){
+    if(c<0 || seen.has(c)) continue;
+    seen.add(c); wrong.push(c);
+    if(wrong.length===3) break;
+  }
+  return opts(fmt(correct), ...wrong.map(fmt));
+}
+
+// Przyporządkuj każdy element do jednej z kategorii. items: [{html, cat}]
+function renderSort(container, cats, items, onAnswer){
+  const list=document.createElement('div'); list.className='sort-list';
+  const picked=new Array(items.length).fill(null);
+  items.forEach((it,i)=>{
+    const row=document.createElement('div'); row.className='sort-row';
+    row.innerHTML=`<span class="sort-item">${it.html}</span><span class="sort-cats"></span>`;
+    const catsWrap=row.querySelector('.sort-cats');
+    cats.forEach((c,ci)=>{
+      const b=document.createElement('button'); b.className='cat-btn'; b.textContent=c;
+      b.onclick=()=>{ picked[i]=ci; [...catsWrap.children].forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); check.disabled=picked.some(p=>p===null); };
+      catsWrap.appendChild(b);
+    });
+    list.appendChild(row);
+  });
+  container.appendChild(list);
+  const r=document.createElement('div'); r.className='center-row';
+  const check=document.createElement('button'); check.className='check-btn'; check.textContent='Sprawdź'; check.disabled=true;
+  r.appendChild(check); container.appendChild(r);
+  check.onclick=()=>{
+    lockAll(list); check.disabled=true;
+    let good=0;
+    items.forEach((it,i)=>{
+      const row=list.children[i];
+      if(picked[i]===it.cat){ good++; row.classList.add('correct'); }
+      else { row.classList.add('wrong'); row.querySelectorAll('.cat-btn')[it.cat].classList.add('should'); }
+    });
+    onAnswer(good/items.length);
+  };
+}
+
+// Dopasuj: do każdego elementu z lewej wybierz z listy element z prawej. pairs: [{l, r}]
+function renderMatch(container, pairs, onAnswer){
+  const rights=shuffle([...new Set(pairs.map(p=>p.r))]);
+  const list=document.createElement('div'); list.className='sort-list';
+  pairs.forEach(p=>{
+    const row=document.createElement('div'); row.className='sort-row';
+    row.innerHTML=`<span class="sort-item">${p.l}</span><select class="match-select" aria-label="Dopasuj: ${esc(p.l.replace(/<[^>]+>/g,''))}"><option value="">— wybierz —</option>${rights.map(r=>`<option>${esc(r)}</option>`).join('')}</select><span class="match-fix"></span>`;
+    list.appendChild(row);
+  });
+  container.appendChild(list);
+  const selects=[...list.querySelectorAll('select')];
+  const r=document.createElement('div'); r.className='center-row';
+  const check=document.createElement('button'); check.className='check-btn'; check.textContent='Sprawdź'; check.disabled=true;
+  r.appendChild(check); container.appendChild(r);
+  selects.forEach(s=>s.addEventListener('change',()=>{ check.disabled=selects.some(x=>!x.value); }));
+  check.onclick=()=>{
+    lockAll(list); check.disabled=true;
+    let good=0;
+    pairs.forEach((p,i)=>{
+      const row=list.children[i];
+      if(selects[i].value===p.r){ good++; row.classList.add('correct'); }
+      else { row.classList.add('wrong'); row.querySelector('.match-fix').textContent='➜ '+p.r; }
+    });
+    onAnswer(good/pairs.length);
+  };
+}
+
+// Ułóż w kolejności. steps: tablica w poprawnej kolejności
+function renderOrder(container, steps, onAnswer){
+  const order=[];
+  const shuffled=shuffle(steps.map((t,i)=>({t,i})));
+  const wrap=document.createElement('div'); wrap.className='options one-col';
+  shuffled.forEach(s=>{
+    const b=document.createElement('button'); b.className='opt-btn order-btn';
+    b.innerHTML=`<span class="badge"></span>${s.t}`;
+    b.onclick=()=>{
+      if(b.classList.contains('selected')) return;
+      order.push(s.i); b.classList.add('selected'); b.querySelector('.badge').textContent=order.length;
+      check.disabled = order.length!==steps.length;
+    };
+    wrap.appendChild(b);
+  });
+  container.appendChild(wrap);
+  const r=document.createElement('div'); r.className='center-row';
+  const reset=document.createElement('button'); reset.className='ghost-btn'; reset.textContent='↺ Od nowa';
+  const check=document.createElement('button'); check.className='check-btn'; check.textContent='Sprawdź'; check.disabled=true;
+  r.append(reset,check); container.appendChild(r);
+  reset.onclick=()=>{ order.length=0; check.disabled=true; [...wrap.children].forEach(b=>{ b.classList.remove('selected'); b.querySelector('.badge').textContent=''; }); };
+  check.onclick=()=>{
+    lockAll(wrap); check.disabled=true; reset.disabled=true;
+    let good=0;
+    shuffled.forEach((s,k)=>{
+      const b=wrap.children[k];
+      const pos=order.indexOf(s.i);
+      b.classList.remove('selected');
+      if(pos===s.i){ good++; b.classList.add('correct'); } else b.classList.add('wrong');
+      b.querySelector('.badge').textContent = pos===s.i ? pos+1 : `${pos+1}→${s.i+1}`;
+    });
+    onAnswer(good===steps.length ? 1 : good/steps.length);
+  };
+}
+
+// Kliknij właściwe liczby w chmurce. words: [{t, ok}]
+function renderWordPick(container, words, onAnswer){
+  const wrap=document.createElement('div'); wrap.className='word-pick';
+  const chosen=new Set();
+  words.forEach((w,i)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='word-btn'; b.textContent=w.t;
+    b.onclick=()=>{ chosen.has(i)?chosen.delete(i):chosen.add(i); b.classList.toggle('selected'); check.disabled=!chosen.size; };
+    wrap.appendChild(b);
+  });
+  container.appendChild(wrap);
+  const r=document.createElement('div'); r.className='center-row';
+  const check=document.createElement('button'); check.className='check-btn'; check.textContent='Sprawdź'; check.disabled=true;
+  r.appendChild(check); container.appendChild(r);
+  check.onclick=()=>{
+    lockAll(wrap); check.disabled=true;
+    let hits=0, wrong=0; const need=words.filter(w=>w.ok).length;
+    words.forEach((w,i)=>{
+      const b=wrap.children[i]; b.classList.remove('selected');
+      if(chosen.has(i)&&w.ok){ b.classList.add('correct'); hits++; }
+      else if(chosen.has(i)){ b.classList.add('wrong'); wrong++; }
+      else if(w.ok) b.classList.add('correct','missed');
+    });
+    onAnswer(Math.max(0,(hits-wrong)/need));
+  };
+}
+
+// Oś liczbowa: n kreseczek w równych odstępach, podpisy {indeks: liczba}, litery {indeks: 'A'}
+function axisSVG(n, labels, letters){
+  const W=340, H=62, x0=16, x1=W-30, y=30, sp=(x1-x0)/(n-1);
+  const X = i => (x0+i*sp).toFixed(1);
+  let s=`<line x1="${x0-8}" y1="${y}" x2="${W-8}" y2="${y}" stroke="currentColor" stroke-width="2"/><path d="M${W-3} ${y} l-11 -5 v10 z" fill="currentColor"/>`;
+  for(let i=0;i<n;i++) s+=`<line x1="${X(i)}" y1="${y-6}" x2="${X(i)}" y2="${y+6}" stroke="currentColor" stroke-width="1.6"/>`;
+  for(const [i,v] of Object.entries(labels)) s+=`<text x="${X(+i)}" y="${y+25}" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">${fmtN(v)}</text>`;
+  for(const [i,ch] of Object.entries(letters)) s+=`<circle cx="${X(+i)}" cy="${y}" r="4.5" class="axis-dot"/><text x="${X(+i)}" y="${y-12}" text-anchor="middle" font-size="15" font-weight="800" class="axis-letter">${ch}</text>`;
+  return `<svg class="axis" viewBox="0 0 ${W} ${H}" role="img" aria-label="Oś liczbowa">${s}</svg>`;
+}
+
+function intro(container, html){ container.innerHTML = html; }
+const qi = t => `<p class="q-instruction">${t}</p>`;
+const sub = t => `<p class="q-sub">${t}</p>`;
+const model = t => `<div class="model">${t}</div>`;
+const nb = n => `<span class="num">${fmtN(n)}</span>`;
+// pole na liczbę
+const numF = (ans, o) => ({accepted:[String(ans)], number:true, size:'short', ...o});
+const eqF = (expr, ans) => numF(ans, {pre:`<span class="num">${expr} =</span>`});
+
+/* =========================================================
+   LEKCJE
+   ========================================================= */
+const LESSONS = [null,
+  {code:'1', name:'Jak zapisujemy liczby'},
+  {code:'2', name:'Oś liczbowa'},
+  {code:'3', name:'Dodawanie i odejmowanie w pamięci'},
+  {code:'4', name:'Szacowanie'},
+  {code:'5', name:'Sprytne dodawanie'},
+  {code:'6', name:'Sprytne odejmowanie'},
+];
+const Q = [];
+const add = (lesson, q) => Q.push({lesson, max:1, ...q});
+
+/* ---------- 1. Jak zapisujemy liczby (s. 48–53) ---------- */
+// powt. 2: zera w grupie tysięcy
+add(1,{ full:true,
+  render(c,a){
+    const m=rnd(2,9), k=rnd(1,9), j=rnd(1,9), t=k*10, r=j*100;
+    const n=m*1e6+t*1000+r;
+    this.hint=`Podziel liczbę na grupy po trzy cyfry: miliony | tysiące | jedności. Miliony: <b>${m}</b>. Tysiące: ${t}, czyli trzy cyfry <b>0${t}</b>. Na końcu: <b>${r}</b>. Razem: <b>${fmtN(n)}</b> (s. 50 – „Nie zapomnij o zerze”).`;
+    intro(c, qi(`Jak zapisać cyframi liczbę <i>${plWords(n)}</i>?`));
+    renderOptions(c, numOpts(n, [Number(`${m}${t}${r}`), Number(`${m}${t}0${j}0`), m*1e6+k*1000+j*10]), a);
+  }
+});
+// powt. 10, 26
+add(1,{ full:true, max:2,
+  render(c,a){
+    const gens=[
+      ()=>rnd(101,999)*1000+rnd(1,9)*100,
+      ()=>rnd(2,99)*1e6+rnd(1,9)*1000+rnd(1,9)*100,
+      ()=>1e6+rnd(11,19)*1000+rnd(1,9),
+      ()=>rnd(2,9)*1e5+rnd(2,9)*10,
+    ];
+    const ns=pick(gens,2).map(g=>g());
+    this.hint=`Przygotuj kreseczki pogrupowane po trzy (S D J | S D J | S D J) i nie zapomnij o zerach: ${ns.map(n=>`<i>${plWords(n)}</i> = <b>${fmtN(n)}</b>`).join('; ')} (s. 50).`;
+    intro(c, qi('Zapisz liczby cyframi.'));
+    renderFields(c, ns.map(n=>numF(n,{label:`<i>${plWords(n)}</i>`, block:true})), a);
+  }
+});
+// powt. 9, „Czy już umiem?” s. 53
+add(1,{ full:true,
+  render(c,a){
+    const n=one([
+      ()=>rnd(2,9)*1000+rnd(2,9)*10,
+      ()=>rnd(2,9)*10000+rnd(2,9)*10,
+      ()=>(rnd(2,9)*100+rnd(1,9)*10)*1000+rnd(1,9)*100+rnd(1,9),
+      ()=>rnd(2,9)*1000+rnd(1,9)*100+rnd(1,9),
+    ])();
+    this.hint=`${fmtN(n)} to <b>${plWords(n)}</b>. Czytaj grupami od lewej: najpierw tysiące, potem resztę (s. 49).`;
+    intro(c, qi(`Zapisz słownie liczbę <span class="num">${fmtN(n)}</span>.`));
+    renderFields(c, [{accepted:[plWords(n)], block:true, size:'wide', placeholder:'słownie'}], a);
+  }
+});
+// powt. 8: kwota według wzoru
+add(1,{ full:true,
+  render(c,a){
+    const d=[rnd(1,9),rnd(1,9),rnd(1,9),rnd(1,9)]; d[rnd(1,3)]=0;
+    const amt=d[0]*1000+d[1]*100+d[2]*10+d[3];
+    const posts=['· 1000 zł','· 100 zł','· 10 zł','· 1 zł'];
+    this.hint=`${amt} zł = <b>${d[0]}</b> · 1000 zł + <b>${d[1]}</b> · 100 zł + <b>${d[2]}</b> · 10 zł + <b>${d[3]}</b> · 1 zł. Cyfra 0 oznacza, że nie ma ani jednego takiego banknotu (s. 52).`;
+    intro(c, qi('Zapisz kwotę według wzoru podanego w ramce.')+model('7309 zł = 7 · 1000 zł + 3 · 100 zł + 0 · 10 zł + 9 · 1 zł'));
+    renderFields(c, d.map((x,i)=>numF(x,{pre:i===0?`${amt} zł =`:'+', post:posts[i], size:'tiny'})), a);
+  }
+});
+// powt. 11: znaki < i >
+add(1,{ full:true, max:2,
+  render(c,a){
+    const p=rnd(1,9); let q; do q=rnd(1,9); while(q===p);
+    const hi=rnd(10,99)*1000, k=rnd(1,9), h=rnd(1,9);
+    const pairs=[
+      [hi+10*p+q, hi+10*q+p],
+      [rnd(10,19)*1000+rnd(100,999), rnd(9000,9999)],
+      [100*k+h, 100*k+10*h],
+      [h*1000-1, h*1000],
+    ].map(pr=>Math.random()<.5 ? pr : [pr[1],pr[0]]);
+    this.hint='Najpierw policz cyfry – liczba, która ma więcej cyfr, jest większa (11 111 > 9999). Gdy cyfr jest tyle samo, porównuj od lewej: tysiące, setki, dziesiątki… Dziób bociana otwiera się do większej liczby (s. 50).';
+    intro(c, qi('Wstaw znak &lt; albo &gt;.'));
+    renderSort(c, ['<','>'], shuffle(pairs).map(([x,y])=>({html:`${nb(x)} &nbsp;?&nbsp; ${nb(y)}`, cat:x<y?0:1})), a);
+  }
+});
+// zad. 5 s. 52, powt. 12: chmurka
+add(1,{
+  render(c,a){
+    const NAMES=['setek','dziesiątek','jedności'];
+    const pos=rnd(0,2), d=rnd(1,9);
+    const make = P => {
+      const arr=[rnd(1,9),rnd(0,9),rnd(0,9)]; arr[P]=d;
+      if(P!==pos){ do arr[pos]=pos===0?rnd(1,9):rnd(0,9); while(arr[pos]===d); }
+      return Number(arr.join(''));
+    };
+    const good=new Set(), bad=new Set();
+    while(good.size<3) good.add(make(pos));
+    while(bad.size<3){ const n=make(one([0,1,2].filter(x=>x!==pos))); if(!good.has(n)) bad.add(n); }
+    this.hint=`Cyfra ${NAMES[pos]} to ${['pierwsza','środkowa','ostatnia'][pos]} cyfra liczby trzycyfrowej. Pasują: <b>${[...good].join(', ')}</b> (s. 49).`;
+    intro(c, qi(`Kliknij wszystkie liczby, których cyfrą ${NAMES[pos]} jest ${d}.`));
+    renderWordPick(c, shuffle([...[...good].map(n=>({t:String(n),ok:true})), ...[...bad].map(n=>({t:String(n),ok:false}))]), a);
+  }
+});
+// zad. 8 s. 52, „Czy już umiem?” s. 53
+add(1,{
+  render(c,a){
+    const [q,ans,why]=one([
+      ['największą liczbę trzycyfrową',999,'Największa cyfra to 9, więc 999.'],
+      ['najmniejszą liczbę trzycyfrową',100,'Pierwsza cyfra nie może być zerem: 100.'],
+      ['największą liczbę trzycyfrową, której wszystkie cyfry są różne',987,'Bierzemy od lewej największe cyfry, które jeszcze nie były użyte: 9, 8, 7.'],
+      ['najmniejszą liczbę trzycyfrową, której wszystkie cyfry są różne',102,'Na początku najmniejsza cyfra różna od zera (1), potem 0, potem 2.'],
+      ['największą liczbę czterocyfrową, której każda cyfra jest inna',9876,'Od lewej największe nieużyte cyfry: 9, 8, 7, 6.'],
+      ['najmniejszą liczbę czterocyfrową, której każda cyfra jest inna',1023,'Na początku 1 (nie może być 0), potem 0, 2, 3.'],
+    ]);
+    this.hint=why;
+    intro(c, qi(`Zapisz ${q}.`));
+    renderFields(c, [numF(ans)], a);
+  }
+});
+// zad. 9 s. 52
+add(1,{
+  render(c,a){
+    const p=rnd(1,8), q=rnd(p+1,9), r=rnd(0,9);
+    const ns=[100*p+q, 100*q+p, 100*p+10*q, 90+r].sort((x,y)=>x-y);
+    this.hint=`Liczba dwucyfrowa jest mniejsza od każdej trzycyfrowej. Trzycyfrowe porównuj od setek: ${ns.join(' &lt; ')} (s. 52).`;
+    intro(c, qi('Ułóż liczby od najmniejszej do największej. Klikaj od najmniejszej.'));
+    renderOrder(c, ns.map(String), a);
+  }
+});
+// przykład s. 49
+add(1,{
+  render(c,a){
+    const t=rnd(1,5), k=rnd(1,9-t), u=t+k, j=rnd(1,u-1), h=u-j;
+    this.hint=`Cyfra dziesiątek: ${t}. Cyfra jedności: ${t} + ${k} = ${u}. Cyfra setek: ${u} − ${j} = ${h}. Szukana liczba to <b>${100*h+10*t+u}</b> (przykład z s. 49).`;
+    intro(c, qi(`Zapisz liczbę trzycyfrową, której cyfra dziesiątek to ${t}, cyfra jedności jest o ${k} większa od cyfry dziesiątek, a cyfra setek jest o ${j} mniejsza od cyfry jedności.`));
+    renderFields(c, [numF(100*h+10*t+u)], a);
+  }
+});
+
+/* ---------- 2. Oś liczbowa (s. 54–60) ---------- */
+// powt. 1
+add(2,{ full:true,
+  render(c,a){
+    const k=one([3,4,5]), st=one([2,3,4,5,6]);
+    let j; do j=rnd(2,10); while(j===k);
+    this.hint=`Od 0 do ${k*st} są ${k} ${form(k,'odstęp','odstępy','odstępów')}, a ${k} · ${st} = ${k*st}, więc kreseczki są co <b>${st}</b>. Litera K stoi na ${j}. kreseczce za zerem: ${j} · ${st} = <b>${j*st}</b>.`;
+    intro(c, qi('Jaką liczbę oznaczono literą K na osi liczbowej?')+axisSVG(11,{0:0,[k]:k*st},{[j]:'K'}));
+    renderOptions(c, numOpts(j*st, [j,(j+1)*st,(j-1)*st,k*st+j,j*st+2]), a);
+  }
+});
+// powt. 13, zadanie z kluczem s. 57
+add(2,{ full:true, max:3,
+  render(c,a){
+    const st=one([1,2,5,10,20,25,50]);
+    const idx=pick([2,3,4,5,6,7,8,9,10],3).sort((x,y)=>x-y);
+    const vals=idx.map(i=>i*st);
+    this.hint=`Podpisane są dwie sąsiednie liczby: 0 i ${st}, więc kreseczki są co <b>${st}</b>. Odliczaj co ${st}: A = ${vals[0]}, B = ${vals[1]}, C = ${vals[2]} (s. 56).`;
+    intro(c, qi('Jakie liczby są ukryte pod literami na osi liczbowej?')+axisSVG(11,{0:0,1:st},{[idx[0]]:'A',[idx[1]]:'B',[idx[2]]:'C'}));
+    renderFields(c, ['A','B','C'].map((L,i)=>numF(vals[i],{label:`${L} =`, num:true})), a);
+  }
+});
+// powt. 27, poziom C i D s. 57–58
+add(2,{ full:true, max:3,
+  render(c,a){
+    const st=one([2,3,5,7,10,20,50]), s=rnd(3,5);
+    const v0=rnd(0,6)*st+(st<=10?rnd(0,st-1):0);
+    const val=i=>v0+i*st;
+    const idx=[rnd(0,s-1), ...pick([s+2,s+3,s+4,s+5,s+6].filter(i=>i<=10),2).sort((x,y)=>x-y)];
+    this.hint=`Sąsiednie podpisane liczby to ${val(s)} i ${val(s+1)}: ${val(s+1)} − ${val(s)} = ${st}, więc kreseczki są co <b>${st}</b>. A jest przed liczbą ${val(s)} – odliczaj wstecz: A = ${val(idx[0])}. Dalej odliczaj do przodu: B = ${val(idx[1])}, C = ${val(idx[2])} (s. 57).`;
+    intro(c, qi('Jakie liczby są ukryte pod literami na osi liczbowej?')+axisSVG(11,{[s]:val(s),[s+1]:val(s+1)},{[idx[0]]:'A',[idx[1]]:'B',[idx[2]]:'C'}));
+    renderFields(c, ['A','B','C'].map((L,i)=>numF(val(idx[i]),{label:`${L} =`, num:true})), a);
+  }
+});
+// gra s. 85: „Jaką liczbę lemur wskazuje ogonem?”
+add(2,{
+  render(c,a){
+    const st=one([10,20,50,100]), k=5, base=rnd(1,9)*st*5;
+    let j; do j=rnd(1,10); while(j===k);
+    const v=base+j*st;
+    this.hint=`Od ${fmtN(base)} do ${fmtN(base+k*st)} jest ${k} odstępów, a ${k} · ${st} = ${k*st}, więc kreseczki są co <b>${st}</b>. Strzałka: ${fmtN(base)} + ${j} · ${st} = <b>${fmtN(v)}</b>.`;
+    intro(c, qi('Jaką liczbę na osi wskazuje strzałka?')+axisSVG(11,{0:base,[k]:base+k*st},{[j]:'↓'}));
+    renderOptions(c, numOpts(v, [base+j, base+(j+1)*st, base+(j-1)*st, base+j*st*2]), a);
+  }
+});
+
+/* ---------- 3. Dodawanie i odejmowanie w pamięci (s. 61–66) ---------- */
+// powt. 14
+add(3,{ full:true, max:4,
+  render(c,a){
+    const addCross=()=>{ const x=rnd(12,88); const u=x%10||5; const b=rnd(Math.max(10-u,2),9); return [`${x-x%10+u} + ${b}`, x-x%10+u+b]; };
+    const add2=()=>{ const x=rnd(21,68), b=rnd(11,29); return [`${x} + ${b}`, x+b]; };
+    const subRound=()=>{ const x=rnd(3,9)*10, b=rnd(2,9); return [`${x} − ${b}`, x-b]; };
+    const subCross=()=>{ const t=rnd(2,9), u=rnd(0,7), b=rnd(u+2,9); return [`${10*t+u} − ${b}`, 10*t+u-b]; };
+    const zero=()=>{ const x=rnd(12,99); return one([[`${x} + 0`, x],[`0 + ${x}`, x],[`${x} − ${x}`, 0],[`${x} − 0`, x]]); };
+    const list=shuffle([addCross(), one([add2,zero])(), subRound(), subCross()]);
+    this.hint=`Przekraczając dziesiątkę, licz w dwóch krokach, np. 17 + 8 = 17 + 3 + 5 = 25, a 26 − 8 = 26 − 6 − 2 = 18. Dodanie albo odjęcie zera nie zmienia liczby (s. 62). Wyniki: ${list.map(([e,v])=>`${e} = ${v}`).join('; ')}.`;
+    intro(c, qi('Oblicz.'));
+    renderFields(c, list.map(([e,v])=>eqF(e,v)), a);
+  }
+});
+// powt. 15, „Czy już umiem?” s. 66
+add(3,{ full:true, max:4,
+  render(c,a){
+    const T=[
+      ()=>{ const x=rnd(11,98)*10, y=rnd(2,9)*10; return [`${x} + ${y}`, x+y]; },
+      ()=>{ const x=rnd(11,59)*100, y=rnd(2,9)*100; return [`${fmtN(x)} + ${fmtN(y)}`, x+y]; },
+      ()=>{ const x=rnd(2,9)*100, y=rnd(11,49)*100; return [`${x} + ${fmtN(y)}`, x+y]; },
+      ()=>{ const x=rnd(11,19)*100, y=rnd(2,9)*100; return [`${fmtN(x)} − ${y}`, x-y]; },
+      ()=>{ const x=rnd(2,9)*1000, y=rnd(1,9)*100; return [`${fmtN(x)} − ${y}`, x-y]; },
+      ()=>{ const x=rnd(11,39)*10, y=rnd(2,9)*10; return x-y<x-x%100 ? [`${x} − ${y}`, x-y] : [`${x+100} − ${y}`, x+100-y]; },
+    ];
+    const list=pick(T,4).map(g=>g());
+    this.hint=`Policz na małych liczbach i dopisz zera, np. 56 + 13 = 69, więc 5600 + 1300 = 6900; 13 − 7 = 6, więc 1300 − 700 = 600. Sprawdzaj, czy na końcu obu liczb jest tyle samo zer (s. 62). Wyniki: ${list.map(([e,v])=>`${e} = ${fmtN(v)}`).join('; ')}.`;
+    intro(c, qi('Oblicz w pamięci.'));
+    renderFields(c, list.map(([e,v])=>eqF(e,v)), a);
+  }
+});
+// powt. 4
+add(3,{ full:true,
+  render(c,a){
+    const x=rnd(21,49), y=rnd(12,39), s=x+y;
+    this.hint=`Szukamy liczby, od której odejmujemy ${x} i zostaje ${y}. Odwróć działanie: ${y} + ${x} = <b>${s}</b>. Sprawdzenie: ${s} − ${x} = ${y} (s. 62).`;
+    intro(c, qi(`Od której liczby trzeba odjąć ${x}, aby otrzymać ${y}?`));
+    renderOptions(c, numOpts(s, [s+2, Math.abs(x-y), s-8, s+10, s-10]), a);
+  }
+});
+// powt. 17, zadanie znienacka s. 53, gra s. 84
+add(3,{ full:true,
+  render(c,a){
+    const v=one([
+      ()=>{ const n=one(['Martyna','Zosia','Hania']), x=rnd(8,13), d=rnd(2,9); return [`${n} ma ${x} ${lat(x)} i jest o ${d} ${lat(d)} młodsza od swojej siostry. Ile lat ma siostra ${n==='Martyna'?'Martyny':n==='Zosia'?'Zosi':'Hani'}?`, x+d, `Siostra jest starsza, więc dodajemy: ${x} + ${d} = <b>${x+d}</b>.`]; },
+      ()=>{ const x=rnd(14,17), d=rnd(3,9); return [`Ania ma ${x} ${lat(x)}. Filip jest o ${d} ${lat(d)} młodszy od Ani. Ile lat ma Filip?`, x-d, `Filip jest młodszy, więc odejmujemy: ${x} − ${d} = <b>${x-d}</b>.`]; },
+      ()=>{ const x=rnd(10,15), d=rnd(51,59); return [`„Mam ${x} ${lat(x)}. Jestem młodszy od dziadka o ${d} ${lat(d)}”. Ile lat ma dziadek?`, x+d, `Dziadek jest starszy, więc dodajemy: ${x} + ${d} = <b>${x+d}</b>.`]; },
+    ])();
+    this.hint=v[2]+' Uważaj na słowa „młodszy” i „starszy” – zastanów się, kto ma więcej lat.';
+    intro(c, qi(v[0]));
+    renderFields(c, [numF(v[1])], a);
+  }
+});
+// powt. 7
+add(3,{ full:true,
+  render(c,a){
+    const x=rnd(11,19), y=rnd(12,24), r=50-x-y;
+    this.hint=`Najpierw policz, ile kosztowały zakupy: ${x} + ${y} = ${x+y} zł. Reszta to różnica: 50 − ${x+y} = <b>${r} zł</b>.`;
+    intro(c, qi(`Pani Ola kupiła pomidory za ${x} zł oraz paprykę za ${y} zł. Zapłaciła banknotem 50 zł. Ile otrzymała reszty?`));
+    renderOptions(c, numOpts(r, [x+y, 50-x, r+10, 50-y, r-10], n=>n+' zł'), a);
+  }
+});
+// powt. 20, zad. 4–6 s. 65, „Czy już umiem?” s. 66
+add(3,{ full:true, max:2,
+  render(c,a){
+    const v=one([
+      ()=>{ const x=rndMany(45,65), d=rndMany(25,45); return [`Na przedstawieniu w teatrze było ${x} uczniów z klas czwartych i o ${d} uczniów więcej z klas piątych. Ilu w sumie uczniów z klas czwartych i piątych było w teatrze?`, 'Uczniów z klas piątych:', x+d, 2*x+d, `Uczniów z klas piątych: ${x} + ${d} = ${x+d}. Razem: ${x} + ${x+d} = <b>${2*x+d}</b>.`]; },
+      ()=>{ const x=rndMany(25,45), d=rndMany(5,19); return [`Grześ zebrał ${x} grzybów, a Krysia zebrała o ${d} grzybów więcej. Ile grzybów zebrali razem?`, 'Krysia zebrała:', x+d, 2*x+d, `Krysia: ${x} + ${d} = ${x+d}. Razem: ${x} + ${x+d} = <b>${2*x+d}</b>.`]; },
+      ()=>{ const x=rndMany(25,45), d=rndMany(5,19); return [`Kasia ma ${x} muszelek, a Jola ma o ${d} muszelek mniej. Ile muszelek mają razem?`, 'Jola ma:', x-d, 2*x-d, `Jola: ${x} − ${d} = ${x-d}. Razem: ${x} + ${x-d} = <b>${2*x-d}</b>.`]; },
+      ()=>{ const x=rnd(21,39), d=rnd(8,19); return [`Klasa IVa zebrała ${x} kg makulatury, a klasa IVb zebrała o ${d} kg więcej. Ile makulatury zebrały w sumie obie klasy?`, 'Klasa IVb zebrała:', x+d, 2*x+d, `IVb: ${x} + ${d} = ${x+d} kg. Razem: ${x} + ${x+d} = <b>${2*x+d} kg</b>.`]; },
+    ])();
+    this.hint=v[4]+' Najpierw policz, ile ma druga osoba – dopiero potem dodaj obie liczby.';
+    intro(c, qi(v[0]));
+    renderFields(c, [numF(v[2],{label:v[1]}), numF(v[3],{label:'Razem:'})], a);
+  }
+});
+// powt. 5
+add(3,{
+  render(c,a){
+    const d=rnd(2,5);
+    const [ok,...bad]=[
+      'Kacper zebrał najmniej jabłek.',
+      'Ula zebrała więcej jabłek niż Ania.',
+      'Kacper zebrał więcej jabłek niż Ania.',
+      'Ula zebrała najwięcej jabłek.',
+    ];
+    this.hint=`Ania ma o ${d} mniej niż Kacper, a Ula o ${d} więcej niż Kacper. Od najmniejszej liczby jabłek: Ania, Kacper, Ula. Najmniej zebrała Ania, nie Kacper.`;
+    intro(c, qi(`Ania, Ula i Kacper zbierali jabłka. Ania zebrała o ${d} jabłka mniej niż Kacper, a Ula zebrała o ${d} jabłka więcej niż Kacper. Które zdanie <u>nie jest</u> prawdziwe?`));
+    renderOptions(c, opts(ok,...bad), a, true);
+  }
+});
+// s. 63: suma i różnica
+add(3,{
+  render(c,a){
+    const x=rnd(21,59), y=rnd(11,39), p=rnd(61,99), q=rnd(12,48);
+    const pairs=shuffle([
+      {l:`${x} w działaniu ${x} + ${y} = ${x+y}`, r:'składnik'},
+      {l:`${x+y} w działaniu ${x} + ${y} = ${x+y}`, r:'suma'},
+      {l:`${p} w działaniu ${p} − ${q} = ${p-q}`, r:'odjemna'},
+      {l:`${q} w działaniu ${p} − ${q} = ${p-q}`, r:'odjemnik'},
+      {l:`${p-q} w działaniu ${p} − ${q} = ${p-q}`, r:'różnica'},
+    ]);
+    this.hint='W dodawaniu: składnik + składnik = suma. W odejmowaniu: odjemna − odjemnik = różnica („dziewczynki mają pierwszeństwo” – najpierw odjemna, s. 63).';
+    intro(c, qi('Jak nazywa się każda z liczb?'));
+    renderMatch(c, pairs, a);
+  }
+});
+// powt. 16
+add(3,{ max:2,
+  render(c,a){
+    const x=rnd(12,30), d=rnd(3,9), y=rnd(30,90), e=rnd(3,9);
+    this.hint=`„O ${d} mniejsza od ${x}” to ${x} − ${d} = ${x-d}. „O ${e} większa od ${y}” to ${y} + ${e} = ${y+e}.`;
+    intro(c, qi('Znajdź liczbę:'));
+    renderFields(c, [numF(x-d,{label:`o ${d} mniejszą od ${x}`}), numF(y+e,{label:`o ${e} większą od ${y}`})], a);
+  }
+});
+// zad. 9 s. 66
+add(3,{
+  render(c,a){
+    const all=rnd(7,9)*10, k=rnd(21,all/2-6), j=all-k;
+    this.hint=`Dżudo trenuje ${all} − ${k} = ${j} osób. To więcej niż karate o ${j} − ${k} = <b>${j-k}</b>.`;
+    intro(c, qi(`W klubie sportowym jest ${all} osób. Karate trenuje ${k} osób, a pozostałe osoby trenują dżudo. O ile więcej osób trenuje dżudo niż karate?`));
+    renderFields(c, [numF(j-k)], a);
+  }
+});
+
+/* ---------- 4. Szacowanie (s. 67–71) ---------- */
+// powt. 6 i 21
+add(4,{ full:true,
+  render(c,a){
+    if(Math.random()<.6){
+      const x=rnd(1100,8800), y=rnd(110,880), s=x+y;
+      this.hint=`${fmtN(x)} to około ${fmtN(Math.round(x/1000)*1000)}, a ${y} to około ${Math.round(y/100)*100} – wynik musi być w pobliżu ${fmtN(Math.round(x/1000)*1000+Math.round(y/100)*100)}. Pasuje tylko <b>${fmtN(s)}</b> (s. 68).`;
+      intro(c, qi(`Jedna z podanych liczb jest wynikiem działania <span class="num">${fmtN(x)} + ${y}</span>. Oszacuj, która to liczba.`));
+      renderOptions(c, numOpts(s, [Math.floor(s/10), s+36000, s+4000, s-1000]), a);
+    } else {
+      const x=rnd(650,990), y=rnd(101,199), d=x-y;
+      this.hint=`${x} to około ${Math.round(x/100)*100}, a ${y} to około ${Math.round(y/100)*100} – wynik to około ${Math.round(x/100)*100-Math.round(y/100)*100}. Pasuje tylko <b>${d}</b> (s. 68).`;
+      intro(c, qi(`Jedna z podanych liczb jest wynikiem działania <span class="num">${x} − ${y}</span>. Oszacuj, która to liczba.`));
+      renderOptions(c, numOpts(d, [x+y, d+200, Math.floor(d/10), d-300]), a);
+    }
+  }
+});
+// powt. 18, zad. 3 s. 70
+add(4,{ full:true, max:2,
+  render(c,a){
+    const Hs=shuffle([200,400,600,800]);
+    const types=[
+      [H=>H-rnd(1,4), H=>`prawie ${H}`],
+      [H=>H-rnd(6,15), H=>`trochę mniej niż ${H}`],
+      [H=>H+(Math.random()<.5?-1:1)*rnd(2,9), H=>`około ${H}`],
+      [H=>H+rnd(4,19), H=>`trochę więcej niż ${H}`],
+    ];
+    const pairs=types.map(([num,txt],i)=>({l:`<span class="num">${num(Hs[i])}</span>`, r:txt(Hs[i])}));
+    this.hint='„Prawie” i „trochę mniej niż” – liczba jest tuż przed pełną setką; „trochę więcej niż” i „ponad” – tuż za nią; „około” – blisko, z jednej albo z drugiej strony. Najpierw sprawdź, do której setki liczbie najbliżej (s. 69).';
+    intro(c, qi('Dopasuj do każdej liczby określenie, które do niej pasuje.'));
+    renderMatch(c, shuffle(pairs), a);
+  }
+});
+// powt. 28, zad. 8 s. 71
+add(4,{ full:true,
+  render(c,a){
+    const enough=Math.random()<.5;
+    if(Math.random()<.5){
+      const M=rnd(5,6); let l1,l2,l3,total;
+      do{ total=M*100+(enough?-1:1)*rnd(45,90); l1=rnd(150,250); l2=rnd(150,250); l3=total-l1-l2; } while(l3<110||l3>260);
+      const r=v=>Math.round(v/10)*10;
+      this.hint=`Zaokrąglij: ${l1} cm ≈ ${r(l1)} cm, ${l2} cm ≈ ${r(l2)} cm, ${l3} cm ≈ ${r(l3)} cm. Razem około ${r(l1)+r(l2)+r(l3)} cm, a Monika ma ${M} m = ${M*100} cm. Dokładnie: ${total} cm, więc wstążki <b>${enough?'wystarczy':'nie wystarczy'}</b>.`;
+      intro(c, qi(`Monika ma ${M} m wstążki. Chce nią obwiązać trzy prezenty. Na pierwszy prezent potrzeba ${l1} cm wstążki, na drugi ${l2} cm, a na trzeci ${l3} cm. Oszacuj, czy Monice wystarczy wstążki.`)+sub('1 m = 100 cm'));
+      renderOptions(c, opts(enough?'Tak, wystarczy':'Nie, nie wystarczy', enough?'Nie, nie wystarczy':'Tak, wystarczy'), a);
+    } else {
+      const k=rnd(4,6), p=rnd(3,5), pg=one([10,15,20]), j=rnd(5,8), q=2, qg=one([10,20]);
+      const est=k*p+j*q, exact=k*(p*100+pg)+j*(q*100+qg);
+      const X = enough ? Math.ceil((exact/100+3)/5)*5 : Math.floor((est-4)/5)*5;
+      this.hint=`Zeszyt kosztuje około ${p} zł, a flamaster około ${q} zł: ${k} · ${p} + ${j} · ${q} = ${k*p} + ${j*q} = ${est} zł (naprawdę trochę więcej). Dominika ma ${X} zł, więc pieniędzy <b>${enough?'wystarczy':'nie wystarczy'}</b>.`;
+      intro(c, qi(`Dominika ma ${X} zł. Oszacuj, czy ta kwota wystarczy jej na ${k} zeszytów po ${p} zł ${pg} gr i ${j} flamastrów po ${q} zł ${qg} gr.`));
+      renderOptions(c, opts(enough?'Tak, wystarczy':'Nie, nie wystarczy', enough?'Nie, nie wystarczy':'Tak, wystarczy'), a);
+    }
+  }
+});
+// zad. 4 s. 70
+add(4,{
+  render(c,a){
+    const H=rnd(2,8)*100, below=Math.random()<.5;
+    const ok=below ? [H-rnd(3,8), H-rnd(9,15)] : [H+rnd(3,8), H+rnd(9,18)];
+    const other=below ? [H+rnd(3,9), H+rnd(10,18)] : [H-rnd(3,9), H-rnd(10,15)];
+    const far=[H+rnd(70,95), H-rnd(55,80), rnd(11,60)];
+    this.hint=`„Trochę ${below?'mniej':'więcej'} niż ${H}” to liczby tuż ${below?'przed':'za'} ${H}: <b>${ok.join(', ')}</b>. Liczby ${other.join(' i ')} są ${below?'większe':'mniejsze'} od ${H}, a pozostałe są za daleko.`;
+    intro(c, qi(`Kliknij w chmurce liczby, które są <b>trochę ${below?'mniejsze':'większe'} niż ${H}</b>.`));
+    renderWordPick(c, shuffle([...ok.map(n=>({t:String(n),ok:true})), ...[...other,...far].map(n=>({t:String(n),ok:false}))]), a);
+  }
+});
+// s. 68: kalkulatory
+add(4,{
+  render(c,a){
+    const x=rnd(5100,9800), y=rnd(11000,29000), s=x+y;
+    const names=shuffle(['Marcin','Agnieszka','Tomek','Małgosia']);
+    const ests=[s, s-10000*rnd(1,2), Math.floor(s/10), s+80000];
+    const est=Math.round(x/1000)*1000+Math.round(y/1000)*1000;
+    this.hint=`Oszacuj: ${fmtN(x)} ≈ ${fmtN(Math.round(x/1000)*1000)}, ${fmtN(y)} ≈ ${fmtN(Math.round(y/1000)*1000)}, razem około ${fmtN(est)}. Blisko tej liczby jest tylko wynik <b>${fmtN(s)}</b> (s. 68).`;
+    intro(c, qi(`Dzieci obliczały na kalkulatorze sumę <span class="num">${fmtN(x)} + ${fmtN(y)}</span>. Tylko jedno z nich otrzymało poprawny wynik. Czyj wynik może być dobry?`));
+    renderOptions(c, shuffle(ests.map((v,i)=>({text:`${names[i]}: ${fmtN(v)}`, correct:i===0}))), a, true);
+  }
+});
+
+/* ---------- 5. Sprytne dodawanie (s. 72–77) ---------- */
+// powt. 3
+add(5,{ full:true,
+  render(c,a){
+    const T=rnd(62,95), as=new Set();
+    while(as.size<3) as.add(rnd(12,T-12));
+    const odd=rnd(12,T-22);
+    const good=[...as].map(x=>`${x} + ${T-x}`), bad=`${odd} + ${T-10-odd}`;
+    this.hint=`Oblicz każde działanie: ${[...as].map(x=>`${x} + ${T-x} = ${T}`).join(', ')}, ale ${bad} = <b>${T-10}</b>.`;
+    intro(c, qi('Które działanie ma inny wynik niż trzy pozostałe?'));
+    renderOptions(c, opts(bad, ...good), a);
+  }
+});
+// powt. 22b, „Czy już umiem?” s. 77
+add(5,{ full:true, max:2,
+  render(c,a){
+    const x=rnd(12,88); const xx=x%10?x:x+3; const y=(10-xx%10)+10*rnd(0,3); const m=rnd(13,47);
+    const e1=shuffle([xx,y]); e1.splice(1,0,m);
+    const big=rnd(1,8)*100+rnd(11,89); const big2=100-big%100;
+    const p=rnd(12,79); const pp=p%10?p:p+1; const q=(10-pp%10)+10*rnd(1,3); const u=rnd(11,29);
+    const e2=shuffle([big,u,pp,big2,q]);
+    const s1=xx+y+m, s2=big+big2+pp+q+u;
+    this.hint=`Szukaj liczb, które razem dają pełne dziesiątki albo setki: ${xx} + ${y} = ${xx+y}, więc ${e1.join(' + ')} = ${xx+y} + ${m} = <b>${s1}</b>. W drugim: ${big} + ${big2} = ${big+big2}, ${pp} + ${q} = ${pp+q}, razem z ${u}: <b>${s2}</b> (s. 72–73).`;
+    intro(c, qi('Oblicz sprytnie. Zastanów się, które liczby dodasz najpierw.'));
+    renderFields(c, [eqF(e1.join(' + '), s1), eqF(e2.join(' + '), s2)], a);
+  }
+});
+// powt. 19a, 22c, „Czy już umiem?” s. 77
+add(5,{ full:true, max:2,
+  render(c,a){
+    // [x, y, pełna dziesiątka/setka, ile jedności przełożyć]
+    const near10=()=>{ const t=10*rnd(3,9), r=rnd(1,3); return [t-r, rnd(24,79), t, r]; };
+    const near100=()=>{ const t=100*rnd(1,4), r=rnd(2,7); return [t-r, rnd(24,89), t, r]; };
+    const list=[near10(), near100()].map(([x,y,t,r])=>({e:Math.random()<.5?`${x} + ${y}`:`${y} + ${x}`, v:x+y, how:`${t} + ${y-r}`}));
+    this.hint=`Przełóż kilka jedności tak, żeby jedna liczba stała się pełną dziesiątką albo setką: ${list.map(o=>`${o.e} = ${o.how} = ${o.v}`).join('; ')} (dodawanie przez przekładanie, s. 74).`;
+    intro(c, qi('Oblicz najwygodniejszym dla siebie sposobem.'));
+    renderFields(c, list.map(o=>eqF(o.e, o.v)), a);
+  }
+});
+// zad. 2 s. 75
+add(5,{ max:2,
+  render(c,a){
+    const ups=pick([[4,6],[8,2],[5,5],[7,3],[1,9]],4);
+    const pairs=ups.map(([u,v])=>[10*rnd(1,8)+u, 10*rnd(1,8)+v]);
+    this.hint=`Patrz na cyfry jedności – muszą dawać razem 10: ${pairs.map(([x,y])=>`${x} + ${y} = ${x+y}`).join(', ')}.`;
+    intro(c, qi('Połącz liczby w pary tak, aby sumowały się do pełnych dziesiątek.'));
+    renderMatch(c, pairs.map(([x,y])=>({l:`<span class="num">${x}</span>`, r:String(y)})), a);
+  }
+});
+// zad. 5 s. 76 (prawdziwe długości rzek)
+add(5,{ max:2,
+  render(c,a){
+    this.hint='Odra: 808 + 46 = 854 km. Wisła: 854 + 193 = 1047 km. Uwaga: Wisła jest dłuższa od Odry, a nie od Warty!';
+    intro(c, qi('Trzy najdłuższe rzeki Polski to Wisła, Odra i Warta. Warta ma 808 km długości, Odra jest o 46 km dłuższa od Warty, a Wisła jest o 193 km dłuższa niż Odra. Oblicz długości Odry i Wisły.'));
+    renderFields(c, [numF(854,{label:'Odra (km):'}), numF(1047,{label:'Wisła (km):'})], a);
+  }
+});
+// zad. 11 s. 77
+add(5,{ max:2,
+  render(c,a){
+    const sz=rnd(21,29), kl=rnd(21,29), pa=rnd(6,9), se=rnd(14,19), tw=rnd(8,12), jo=rnd(2,4);
+    this.hint=`Wędliny: szynka, kiełbasa i parówki: ${sz} + ${kl} + ${pa} = ${sz+kl+pa} zł. Nabiał: ser, twaróg i jogurt: ${se} + ${tw} + ${jo} = ${se+tw+jo} zł.`;
+    intro(c, qi(`Kuba kupił szynkę za ${sz} zł, ser żółty za ${se} zł, paczkę twarogu za ${tw} zł, kiełbasę za ${kl} zł, paczkę parówek za ${pa} zł i jogurt za ${jo} zł. Oblicz, ile Kuba wydał na wędliny, a ile na nabiał.`));
+    renderFields(c, [numF(sz+kl+pa,{label:'Wędliny (zł):'}), numF(se+tw+jo,{label:'Nabiał (zł):'})], a);
+  }
+});
+// zad. 9 s. 76
+add(5,{
+  render(c,a){
+    const i=rndMany(11,19), k=rndMany(15,29), p=rndMany(5,9), d=rndMany(25,39);
+    this.hint=`Pułapka! Psy to nie ptaki. Ptaki: indyki, kury i kaczki: ${i} + ${k} + ${d} = <b>${i+k+d}</b>.`;
+    intro(c, qi(`Na podwórku jest ${i} indyków, ${k} kur, ${p} psów i ${d} kaczek. Ile ptaków jest na podwórku?`));
+    renderFields(c, [numF(i+k+d)], a);
+  }
+});
+
+/* ---------- 6. Sprytne odejmowanie (s. 78–83) ---------- */
+// powt. 24, „Czy już umiem?” s. 83
+add(6,{ full:true, max:3,
+  render(c,a){
+    const h=rnd(3,9), t=rnd(2,9), u=rnd(2,9);
+    const x=100*h+10*t+u, y=100*rnd(1,h-1)+10*rnd(1,t)+rnd(1,u);
+    const b1=rnd(4,9), u1=rnd(0,b1-1), aa=10*rnd(5,9)+u1, bb=10*rnd(1,3)+b1;
+    const cc=100*rnd(1,4)+rnd(11,79), dd=rnd(91,98);
+    const list=[[`${x} − ${y}`, x-y],[`${aa} − ${bb}`, aa-bb],[`${cc} − ${dd}`, cc-dd]];
+    this.hint=`${x} − ${y}: jedności od jedności, dziesiątki od dziesiątek, setki od setek = ${x-y}. ${aa} − ${bb}: „po kawałku” – ${aa} − ${bb-b1} − ${b1} = ${aa-bb}. ${cc} − ${dd}: powiększ obie liczby o ${100-dd}: ${cc+100-dd} − 100 = ${cc-dd} (s. 78–80).`;
+    intro(c, qi('Oblicz najwygodniejszym dla siebie sposobem.'));
+    renderFields(c, list.map(([e,v])=>eqF(e,v)), a);
+  }
+});
+// powt. 23
+add(6,{ full:true, max:2,
+  render(c,a){
+    const T=[[100,()=>rnd(21,89)],[200,()=>rnd(51,189)],[500,()=>rnd(151,449)]];
+    const list=pick(T,2).map(([B,g])=>{ const p=g(); return [B,p]; });
+    this.hint=`Reszta to banknot minus cena. Możesz doliczać od ceny do banknotu (odejmowanie przez dodawanie): ${list.map(([B,p])=>`${B} − ${p} = ${B-p}`).join('; ')} (s. 80).`;
+    intro(c, qi('Oblicz, ile reszty otrzyma klient, który ma zapłacić:'));
+    renderFields(c, list.map(([B,p])=>numF(B-p,{label:`${p} zł, a podaje banknot ${B} zł`})), a);
+  }
+});
+// powt. 25, „Czy już umiem?” s. 83, zad. 2 s. 81
+add(6,{ full:true,
+  render(c,a){
+    const v=one([
+      ()=>{ const x=rndMany(125,165), y=rndMany(85,99); return [`Wczoraj kurier dostarczył ${x} paczek, a dzisiaj dostarczył ${y} paczek. O ile mniej paczek kurier dostarczył dzisiaj niż wczoraj?`, x-y, `${x} − ${y} = ${x-y}`]; },
+      ()=>{ const x=rndMany(155,185), y=rndMany(215,245); return [`W małym zestawie jest ${x} klocków, a w dużym zestawie jest ${y} klocków. O ile więcej klocków znajduje się w dużym zestawie?`, y-x, `${y} − ${x} = ${y-x}`]; },
+      ()=>{ const x=rnd(505,535), y=rnd(451,489); return [`Na wybiegu w zoo mieszkają dwie żyrafy. Jedna ma wysokość ${x} cm, a druga ${y} cm. Jaka jest między nimi różnica wysokości (w cm)?`, x-y, `${x} − ${y} = ${x-y}`]; },
+    ])();
+    this.hint=`„O ile więcej / mniej” i „różnica” oznaczają odejmowanie: ${v[2]}.`;
+    intro(c, qi(v[0]));
+    renderFields(c, [numF(v[1])], a);
+  }
+});
+// poziom D s. 80
+add(6,{ max:2,
+  render(c,a){
+    const x=10*rnd(2,5)+rnd(1,8), t=Math.ceil(x/10)*10, top=t+10*rnd(1,3), y=top+rnd(1,8);
+    this.hint=`Doliczaj od ${x} do ${y}: do ${t} brakuje ${t-x}, do ${top} brakuje ${top-t}, do ${y} brakuje ${y-top}. Razem ${t-x} + ${top-t} + ${y-top} = ${y-x}, więc ${y} − ${x} = <b>${y-x}</b> (s. 80).`;
+    intro(c, qi(`Oblicz <span class="num">${y} − ${x}</span>, odejmując przez dodawanie. Uzupełnij.`));
+    renderFields(c, [
+      numF(t-x,{pre:`${x} +`, post:`= ${t}`, size:'tiny'}),
+      numF(top-t,{pre:`${t} +`, post:`= ${top}`, size:'tiny'}),
+      numF(y-top,{pre:`${top} +`, post:`= ${y}`, size:'tiny'}),
+      numF(y-x,{pre:`${y} − ${x} =`, size:'tiny'}),
+    ], a);
+  }
+});
+// poziom C s. 79
+add(6,{
+  render(c,a){
+    const y=10*rnd(5,9)+rnd(1,8), x=y+rnd(18,58), d=100-y;
+    this.hint=`Powiększ obie liczby o ${d}, żeby odjemnik był pełną setką: ${x} + ${d} = ${x+d}, ${y} + ${d} = 100. Różnica się nie zmienia: ${x+d} − 100 = <b>${x-y}</b> (s. 79).`;
+    intro(c, qi(`Oblicz <span class="num">${x} − ${y}</span> przez powiększanie obu liczb. Uzupełnij.`));
+    renderFields(c, [
+      numF(x+d,{pre:`${x} − ${y} =`, post:'− 100', size:'tiny'}),
+      numF(x-y,{pre:'=', size:'tiny'}),
+    ], a);
+  }
+});
+// zad. 9 s. 83
+add(6,{ max:2,
+  render(c,a){
+    let a1,a2,m1,m2;
+    do{ a1=rnd(51,69); a2=rnd(51,69); m1=rnd(61,79); m2=rnd(41,59); } while(a1>=m1 || a1+a2===m1+m2);
+    const A=a1+a2, M=m1+m2, w=A>M?'Andrzej':'Mirek';
+    this.hint=`Po pierwszej rundzie: ${m1} − ${a1} = ${m1-a1}. Razem: Andrzej ${a1} + ${a2} = ${A}, Mirek ${m1} + ${m2} = ${M}. Wygrał ${w}, przewaga: ${Math.max(A,M)} − ${Math.min(A,M)} = ${Math.abs(A-M)}.`;
+    intro(c, qi(`Andrzej i Mirek grali w grę składającą się z dwóch rund. Andrzej w pierwszej rundzie zdobył ${a1} ${form(a1,'punkt','punkty','punktów')}, a w drugiej ${a2} ${form(a2,'punkt','punkty','punktów')}. Mirek w pierwszej rundzie zdobył ${m1} ${form(m1,'punkt','punkty','punktów')}, a w drugiej ${m2} ${form(m2,'punkt','punkty','punktów')}.`));
+    renderFields(c, [numF(m1-a1,{label:'Różnica punktów po pierwszej rundzie:', block:true}), numF(Math.abs(A-M),{label:'O ile punktów więcej miał zwycięzca po całej grze?', block:true})], a);
+  }
+});
+// QUIZ s. 80
+add(6,{
+  render(c,a){
+    const t=rnd(1,8), u=one([1,2,3,4,6,7,8,9]), x=10*t+u, ok=100-x;
+    this.hint=`Do ${x} dodaj ${10-u}, żeby mieć pełną dziesiątkę ${x+10-u}, potem ${100-x-10+u} do setki. Razem ${10-u} + ${100-x-10+u} = <b>${ok}</b>. Sprawdzenie: ${x} + ${ok} = 100.`;
+    intro(c, qi(`Którą liczbę trzeba dodać do ${x}, aby dostać pełną setkę?`));
+    renderOptions(c, numOpts(ok, [10*(10-t)+(10-u), 10*(9-t)+u, 10*(10-t)+u, ok+10]), a);
+  }
+});
+
+/* =========================================================
+   STEROWANIE
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const startScreen=$('start-screen'), quizScreen=$('quiz-screen'), resultScreen=$('result-screen');
+const questionArea=$('question-area'), feedback=$('feedback'), nextBtn=$('next-btn');
+const PRAISE = ['Świetnie! ✅','Brawo! 🎉','Dokładnie tak! 👍','Super! ⭐','Tak jest! 🙌','Bezbłędnie! 🏆'];
+
+const state = { list:[], index:0, score:0, total:0, perLesson:{}, review:[] };
+const sumMax = list => list.reduce((s,q)=>s+q.max,0);
+
+// wybór lekcji
+const pickEl=$('lesson-pick');
+for(let l=1;l<LESSONS.length;l++){
+  const qs=Q.filter(q=>q.lesson===l);
+  pickEl.insertAdjacentHTML('beforeend',`<label><input type="checkbox" value="${l}" checked> <span><span class="code">${LESSONS[l].code}.</span> ${LESSONS[l].name}</span><span class="cnt">${qs.length} zad. · ${sumMax(qs)} pkt</span></label>`);
+}
+const boxes=()=>[...pickEl.querySelectorAll('input')];
+function refreshStart(){ $('start-btn').disabled = !boxes().some(b=>b.checked); }
+pickEl.addEventListener('change',refreshStart);
+$('pick-all').onclick=()=>{ boxes().forEach(b=>b.checked=true); refreshStart(); };
+$('pick-none').onclick=()=>{ boxes().forEach(b=>b.checked=false); refreshStart(); };
+
+// Pełny sprawdzian: zadania oznaczone „full” (wzorowane na Zadaniach powtórzeniowych), po kolei lekcjami.
+// 21 zadań, 42 punkty – tyle, żeby zmieścić się w jednej lekcji (45 minut).
+const FULL_MINUTES = 45;
+const buildFull = () => Q.filter(q=>q.full);
+const fullSample=buildFull();
+$('full-info').innerHTML=`Wszystkie lekcje naraz, jak na prawdziwym sprawdzianie: <b>${fullSample.length} zadań</b>, <b>${sumMax(fullSample)} punktów</b>. Masz <b>${FULL_MINUTES} minut</b> – po tym czasie sprawdzian się kończy, a niezrobione zadania liczą się jako 0 pkt.`;
+
+let timerId=null;
+function stopTimer(){ clearInterval(timerId); timerId=null; $('timer').hidden=true; }
+function startTimer(min){
+  const end=Date.now()+min*60000, el=$('timer');
+  el.hidden=false; el.className='';
+  const tick=()=>{
+    const left=Math.max(0, Math.round((end-Date.now())/1000));
+    el.textContent=`⏱ ${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;
+    if(left<=300) el.className='low';
+    if(left===0){ el.className='out'; clearInterval(timerId); timerId=null; state.timeUp=true; showResults(); }
+  };
+  tick(); timerId=setInterval(tick,1000);
+}
+
+function startQuiz(lessons, list){
+  const chosen=new Set(lessons);
+  state.list=[];
+  if(list) state.list=list;
+  else for(let l=1;l<LESSONS.length;l++) if(chosen.has(l)) state.list.push(...shuffle(Q.filter(q=>q.lesson===l)));
+  state.full=!!list; state.timeUp=false; state.done=0;
+  stopTimer(); if(state.full) startTimer(FULL_MINUTES);
+  state.index=0; state.score=0; state.total=sumMax(state.list); state.perLesson={}; state.review=[];
+  state.list.forEach(q=>{ state.perLesson[q.lesson]=state.perLesson[q.lesson]||{ok:0,total:0}; state.perLesson[q.lesson].total+=q.max; });
+  startScreen.hidden=true; resultScreen.hidden=true; quizScreen.hidden=false;
+  $('score-total').textContent=state.total;
+  showQuestion();
+}
+
+function showQuestion(){
+  const q=state.list[state.index], total=state.list.length;
+  $('progress-fill').style.width=(state.index/total*100)+'%';
+  $('progress-text').textContent=`Zadanie ${state.index+1} z ${total}`;
+  $('score-text').textContent=fmtPts(state.score);
+  $('q-number').textContent=`Lekcja ${LESSONS[q.lesson].code} · ${LESSONS[q.lesson].name}`;
+  $('q-pts').textContent=`${q.max} ${ptsWord(q.max)}`;
+  feedback.textContent=''; feedback.className='feedback';
+  nextBtn.hidden=true;
+  questionArea.innerHTML='';
+  let answered=false;
+  q.render(questionArea, (frac,noHint,note)=>{ if(answered) return; answered=true; handleAnswer(frac,q,noHint,note); });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// frac: 0–1; punkty zaokrąglamy w dół do połówek
+function handleAnswer(frac,q,noHint,note){
+  const pts = Math.floor(Math.max(0,Math.min(1,frac))*q.max*2+1e-9)/2;
+  state.done++;
+  state.score+=pts; state.perLesson[q.lesson].ok+=pts;
+  $('score-text').textContent=fmtPts(state.score);
+  if(pts<q.max){
+    const t=questionArea.querySelector('.q-instruction');
+    state.review.push({lesson:q.lesson, text:t?t.textContent:LESSONS[q.lesson].name, pts, max:q.max});
+  }
+  const noteHTML = note ? `<div class="hint-box">✏️ ${note}</div>` : '';
+  if(pts===q.max){
+    feedback.innerHTML=PRAISE[Math.floor(Math.random()*PRAISE.length)]+noteHTML;
+    feedback.className='feedback feedback-good';
+  } else {
+    const head = pts>0 ? `Częściowo dobrze: ${fmtPts(pts)} z ${q.max} pkt.` : 'Niepoprawnie.';
+    feedback.innerHTML = head + (noHint||!q.hint ? '' : `<div class="hint-box">💡 <strong>Wyjaśnienie:</strong> ${q.hint}</div>`) + noteHTML;
+    feedback.className='feedback '+(pts>0?'feedback-half':'feedback-bad');
+  }
+  nextBtn.hidden=false;
+  nextBtn.focus({preventScroll:true});
+}
+
+function goNext(){
+  state.index++;
+  if(state.index>=state.list.length) showResults(); else showQuestion();
+}
+
+// Skala ocen: do 29% – 1, 30–49% – 2, 50–74% – 3, 75–84% – 4, 85–97% – 5, powyżej 97% – 6
+function schoolGrade(pct){
+  if(pct<30) return {n:1,name:'niedostateczny',color:'var(--bad)'};
+  if(pct<50) return {n:2,name:'dopuszczający',color:'var(--e1)'};
+  if(pct<75) return {n:3,name:'dostateczny',color:'var(--e1)'};
+  if(pct<85) return {n:4,name:'dobry',color:'var(--good)'};
+  if(pct<=97) return {n:5,name:'bardzo dobry',color:'var(--good)'};
+  return {n:6,name:'celujący',color:'var(--primary)'};
+}
+
+function showResults(){
+  const timeUp=state.timeUp; stopTimer();
+  quizScreen.hidden=true; resultScreen.hidden=false;
+  const total=state.total, s=state.score;
+  $('result-title').textContent=`Wynik: ${fmtPts(s)} / ${total} pkt`;
+  const pct=s/total*100, g=schoolGrade(pct);
+  $('result-grade').innerHTML=`<span class="grade-num" style="background:${g.color}">${g.n}</span><span class="grade-txt"><b>${g.name}</b><span>${Math.round(pct)}% punktów</span></span>`;
+  let desc;
+  if(s===total) desc='Perfekcyjnie! Wszystko bezbłędnie! 🏆';
+  else if(s>=total*0.75) desc='Świetna robota! 👏';
+  else if(s>=total*0.5) desc='Dobrze! Jeszcze trochę ćwiczeń i będzie super! 💪';
+  else desc='Przejrzyj Podsumowanie na s. 86–87 i poćwicz lekcje, w których było najwięcej błędów – na pewno pójdzie lepiej! 📚';
+  if(timeUp) desc=`⏰ Czas minął! Zrobione zadania: ${state.done} z ${state.list.length}. Pozostałe liczą się jako 0 pkt. ` + desc;
+  $('result-desc').textContent=desc;
+  const bd=$('breakdown'); bd.innerHTML='';
+  Object.keys(state.perLesson).sort((x,y)=>x-y).forEach(l=>{
+    const {ok,total:t}=state.perLesson[l], p=ok/t;
+    const color = p>=0.75 ? 'var(--good)' : p>=0.5 ? 'var(--e1)' : 'var(--bad)';
+    bd.insertAdjacentHTML('beforeend',`<div class="bd-row"><span>${LESSONS[l].code}. ${LESSONS[l].name}</span><span class="bd-score">${fmtPts(ok)}/${t}</span><div class="bd-bar"><div class="bd-fill" style="width:${p*100}%;background:${color}"></div></div></div>`);
+  });
+  $('review').innerHTML = state.review.length
+    ? `<h3>Do powtórki:</h3><ul>${state.review.map(r=>`<li>Lekcja ${esc(LESSONS[r.lesson].code)}: ${esc(r.text)} <span style="color:var(--muted)">(${fmtPts(r.pts)}/${r.max})</span></li>`).join('')}</ul>`
+    : '';
+}
+
+$('full-btn').onclick=()=>startQuiz([], buildFull());
+$('start-btn').onclick=()=>startQuiz(boxes().filter(b=>b.checked).map(b=>+b.value));
+$('restart-btn').onclick=()=>{ resultScreen.hidden=true; startScreen.hidden=false; };
+nextBtn.onclick=goNext;
+</script>
+</body>
+</html>
