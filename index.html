@@ -101,6 +101,7 @@
   .field-label.num{min-width:48px;text-align:right;color:var(--primary-dark);}
   .field.block .field-label,.field-label.inline{min-width:0;}
   .field-text{font-weight:700;font-variant-numeric:tabular-nums;}
+  .seg{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;}
   .field-tip{font-size:.85rem;color:var(--muted);font-weight:700;}
   .answer-input{width:190px;max-width:100%;padding:8px 10px;font-size:1.06rem;border:2px solid var(--line);border-radius:12px;font-family:inherit;font-weight:700;background:var(--card);color:var(--ink);font-variant-numeric:tabular-nums;}
   .answer-input.short{width:120px;}
@@ -318,18 +319,23 @@ const NOTES = {
 // Pola do wpisania. field: {label, pre, post, accepted:[...], number, lang, size:'short'|'tiny'|'wide', block, num}
 function renderFields(container, fields, onAnswer){
   const wrap=document.createElement('div'); wrap.className='fields';
+  // cont:true – okienko w tej samej linijce co poprzednie (zapis kolejnych kroków obliczeń)
+  let target=null;
   fields.forEach((f,i)=>{
-    const row=document.createElement('div'); row.className='field'+(f.block?' block':'');
     const ph = f.placeholder ?? '';
-    row.innerHTML=
-      (f.label!=null?`<label class="field-label${f.num?' num':''}${(f.pre||f.post)&&!f.block?' inline':''}" for="f${i}">${f.label}${f.block||f.num||f.pre||f.post?'':'<span class="arrow">→</span>'}</label>`:'')+
-      (f.block?'<div class="field">':'')+
+    const seg=
+      `<span class="seg">`+
       (f.pre?`<span class="field-text">${f.pre}</span>`:'')+
       `<input type="text" id="f${i}" class="answer-input ${f.size||''}"${f.number?' inputmode="numeric"':''} lang="pl" placeholder="${ph}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">`+
       (f.post?`<span class="field-text">${f.post}</span>`:'')+
-      `<span class="fix"></span>`+
-      (f.block?'</div>':'');
+      `<span class="fix"></span></span>`;
+    if(f.cont && target){ target.insertAdjacentHTML('beforeend', seg); return; }
+    const row=document.createElement('div'); row.className='field'+(f.block?' block':'');
+    row.innerHTML=
+      (f.label!=null?`<label class="field-label${f.num?' num':''}${(f.pre||f.post)&&!f.block?' inline':''}" for="f${i}">${f.label}${f.block||f.num||f.pre||f.post?'':'<span class="arrow">→</span>'}</label>`:'')+
+      (f.block?`<div class="field">${seg}</div>`:seg);
     wrap.appendChild(row);
+    target = f.block ? row.lastElementChild : row;
   });
   container.appendChild(wrap);
   const r=document.createElement('div'); r.className='center-row';
@@ -347,7 +353,7 @@ function renderFields(container, fields, onAnswer){
     let score=0; const notes=new Set();
     fields.forEach((f,i)=>{
       const {res,ans}=checkField(f, inputs[i].value);
-      const fix=inputs[i].parentElement.querySelector('.fix');
+      const fix=inputs[i].closest('.seg').querySelector('.fix');
       if(res==='ok'){ score+=1; inputs[i].classList.add('correct'); return; }
       if(res==='bad'){ inputs[i].classList.add('wrong'); fix.textContent='➜ '+ans; return; }
       score+=0.5; inputs[i].classList.add('half'); fix.classList.add('half-fix'); fix.textContent='½ ➜ '+ans;
@@ -941,9 +947,15 @@ add(5,{ full:true, max:2,
     const p=rnd(12,79); const pp=p%10?p:p+1; const q=(10-pp%10)+10*rnd(1,3); const u=rnd(11,29);
     const e2=shuffle([big,u,pp,big2,q]);
     const s1=xx+y+m, s2=big+big2+pp+q+u;
-    this.hint=`Szukaj liczb, które razem dają pełne dziesiątki albo setki: ${xx} + ${y} = ${xx+y}, więc ${e1.join(' + ')} = ${xx+y} + ${m} = <b>${s1}</b>. W drugim: ${big} + ${big2} = ${big+big2}, ${pp} + ${q} = ${pp+q}, razem z ${u}: <b>${s2}</b> (s. 72–73).`;
-    intro(c, qi('Oblicz sprytnie. Zastanów się, które liczby dodasz najpierw.'));
-    renderFields(c, [eqF(e1.join(' + '), s1), eqF(e2.join(' + '), s2)], a);
+    this.hint=`Najpierw dodaj liczby, które razem dają pełne dziesiątki albo setki: ${xx} + ${y} = ${xx+y}, a potem ${xx+y} + ${m} = <b>${s1}</b>. W drugim: ${big} + ${big2} = ${big+big2}, ${pp} + ${q} = ${pp+q}, a potem ${big+big2} + ${pp+q} + ${u} = <b>${s2}</b> (s. 72–73).`;
+    intro(c, qi('Oblicz sprytnie – najpierw dodaj liczby, które dają pełne dziesiątki albo setki. Uzupełnij obliczenia.'));
+    renderFields(c, [
+      numF(xx+y,{pre:`<span class="num">${e1.join(' + ')} = ${xx} + ${y} + ${m} =</span>`, post:`+ ${m}`, size:'tiny'}),
+      numF(s1,{pre:'=', size:'tiny', cont:true}),
+      numF(big+big2,{pre:`<span class="num">${e2.join(' + ')} = ${big} + ${big2} + ${pp} + ${q} + ${u} =</span>`, post:'+', size:'tiny'}),
+      numF(pp+q,{post:`+ ${u}`, size:'tiny', cont:true}),
+      numF(s2,{pre:'=', size:'tiny', cont:true}),
+    ], a);
   }
 });
 // powt. 19a, 22c, „Czy już umiem?” s. 77
@@ -952,10 +964,13 @@ add(5,{ full:true, max:2,
     // [x, y, pełna dziesiątka/setka, ile jedności przełożyć]
     const near10=()=>{ const t=10*rnd(3,9), r=rnd(1,3); return [t-r, rnd(24,79), t, r]; };
     const near100=()=>{ const t=100*rnd(1,4), r=rnd(2,7); return [t-r, rnd(24,89), t, r]; };
-    const list=[near10(), near100()].map(([x,y,t,r])=>({e:Math.random()<.5?`${x} + ${y}`:`${y} + ${x}`, v:x+y, how:`${t} + ${y-r}`}));
+    const list=[near10(), near100()].map(([x,y,t,r])=>({e:Math.random()<.5?`${x} + ${y}`:`${y} + ${x}`, v:x+y, t, rest:y-r, how:`${t} + ${y-r}`}));
     this.hint=`Przełóż kilka jedności tak, żeby jedna liczba stała się pełną dziesiątką albo setką: ${list.map(o=>`${o.e} = ${o.how} = ${o.v}`).join('; ')} (dodawanie przez przekładanie, s. 74).`;
-    intro(c, qi('Oblicz najwygodniejszym dla siebie sposobem.'));
-    renderFields(c, list.map(o=>eqF(o.e, o.v)), a);
+    intro(c, qi('Oblicz, przekładając jedności tak, żeby jedna z liczb była pełną dziesiątką albo setką. Uzupełnij obliczenia.'));
+    renderFields(c, list.flatMap(o=>[
+      numF(o.rest,{pre:`<span class="num">${o.e} = ${o.t} +</span>`, size:'tiny'}),
+      numF(o.v,{pre:'=', size:'tiny', cont:true}),
+    ]), a);
   }
 });
 // zad. 2 s. 75
@@ -1000,23 +1015,38 @@ add(5,{
 add(6,{ full:true, max:3,
   render(c,a){
     const h=rnd(3,9), t=rnd(2,9), u=rnd(2,9);
-    const x=100*h+10*t+u, y=100*rnd(1,h-1)+10*rnd(1,t)+rnd(1,u);
+    const hy=rnd(1,h-1), ty=rnd(1,t), uy=rnd(1,u);
+    const x=100*h+10*t+u, y=100*hy+10*ty+uy;
     const b1=rnd(4,9), u1=rnd(0,b1-1), aa=10*rnd(5,9)+u1, bb=10*rnd(1,3)+b1;
     const cc=100*rnd(1,4)+rnd(11,79), dd=rnd(91,98);
-    const list=[[`${x} − ${y}`, x-y],[`${aa} − ${bb}`, aa-bb],[`${cc} − ${dd}`, cc-dd]];
-    this.hint=`${x} − ${y}: jedności od jedności, dziesiątki od dziesiątek, setki od setek = ${x-y}. ${aa} − ${bb}: „po kawałku” – ${aa} − ${bb-b1} − ${b1} = ${aa-bb}. ${cc} − ${dd}: powiększ obie liczby o ${100-dd}: ${cc+100-dd} − 100 = ${cc-dd} (s. 78–80).`;
-    intro(c, qi('Oblicz najwygodniejszym dla siebie sposobem.'));
-    renderFields(c, list.map(([e,v])=>eqF(e,v)), a);
+    this.hint=`a) Setki od setek: ${100*h} − ${100*hy} = ${100*(h-hy)}, dziesiątki od dziesiątek: ${10*t} − ${10*ty} = ${10*(t-ty)}, jedności od jedności: ${u} − ${uy} = ${u-uy}; razem ${x-y}. b) „Po kawałku”: ${aa} − ${bb-b1} = ${aa-bb+b1}, a potem ${aa-bb+b1} − ${b1} = ${aa-bb}. c) Powiększ obie liczby o ${100-dd}: ${cc} + ${100-dd} = ${cc+100-dd}, ${dd} + ${100-dd} = 100, więc ${cc+100-dd} − 100 = ${cc-dd} (s. 78–79).`;
+    intro(c, qi('Oblicz sposobami poznanymi na lekcji. Uzupełnij obliczenia.')+sub('a) setki od setek, dziesiątki od dziesiątek, jedności od jedności &nbsp;b) „po kawałku” &nbsp;c) powiększając obie liczby'));
+    renderFields(c, [
+      numF(100*(h-hy),{label:'a)', num:true, pre:`<span class="num">${x} − ${y} =</span>`, post:'+', size:'tiny'}),
+      numF(10*(t-ty),{post:'+', size:'tiny', cont:true}),
+      numF(u-uy,{post:'=', size:'tiny', cont:true}),
+      numF(x-y,{size:'tiny', cont:true}),
+      numF(aa-bb+b1,{label:'b)', num:true, pre:`<span class="num">${aa} − ${bb} = ${aa} − ${bb-b1} − ${b1} =</span>`, post:`− ${b1}`, size:'tiny'}),
+      numF(aa-bb,{pre:'=', size:'tiny', cont:true}),
+      numF(cc+100-dd,{label:'c)', num:true, pre:`<span class="num">${cc} − ${dd} =</span>`, post:'− 100', size:'tiny'}),
+      numF(cc-dd,{pre:'=', size:'tiny', cont:true}),
+    ], a);
   }
 });
 // powt. 23
 add(6,{ full:true, max:2,
   render(c,a){
-    const T=[[100,()=>rnd(21,89)],[200,()=>rnd(51,189)],[500,()=>rnd(151,449)]];
-    const list=pick(T,2).map(([B,g])=>{ const p=g(); return [B,p]; });
-    this.hint=`Reszta to banknot minus cena. Możesz doliczać od ceny do banknotu (odejmowanie przez dodawanie): ${list.map(([B,p])=>`${B} − ${p} = ${B-p}`).join('; ')} (s. 80).`;
-    intro(c, qi('Oblicz, ile reszty otrzyma klient, który ma zapłacić:'));
-    renderFields(c, list.map(([B,p])=>numF(B-p,{label:`${p} zł, a podaje banknot ${B} zł`})), a);
+    const [B,lo,hi]=one([[100,21,89],[200,51,189],[500,151,449]]);
+    let p; do p=rnd(lo,hi); while(p%10===0);
+    // doliczanie: do pełnej dziesiątki, do pełnej setki, do banknotu (pomijamy kroki, które nic nie dodają)
+    const stops=[...new Set([Math.ceil(p/10)*10, Math.ceil(p/100)*100, B])];
+    let from=p; const chain=stops.map(to=>{ const st=[from,to]; from=to; return st; });
+    this.hint=`Doliczaj od ceny do banknotu: ${chain.map(([f,t])=>`${f} + ${t-f} = ${t}`).join(', ')}. Reszta to ${chain.map(([f,t])=>t-f).join(' + ')} = <b>${B-p} zł</b> (odejmowanie przez dodawanie, s. 80).`;
+    intro(c, qi(`Klient ma zapłacić ${p} zł i podaje banknot ${B} zł. Oblicz resztę, doliczając od ceny do kwoty banknotu. Uzupełnij obliczenia.`));
+    renderFields(c, [
+      ...chain.map(([f,t])=>numF(t-f,{pre:`${f} +`, post:`= ${t}`, size:'tiny'})),
+      numF(B-p,{label:'Reszta (zł):'}),
+    ], a);
   }
 });
 // powt. 25, „Czy już umiem?” s. 83, zad. 2 s. 81
